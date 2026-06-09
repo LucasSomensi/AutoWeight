@@ -77,27 +77,47 @@ def extrair_peso(linha):
     return status_balanca, peso
 
 
-def registrar_pesagem_csv(ultima_leitura, amostras):
+CAMPOS_CSV = ["data_hora", "peso_maximo_janela_kg"]
+
+
+def criar_arquivo_csv_com_permissao():
+    if ARQUIVO_CSV.exists():
+        return True
+
+    try:
+        resposta = input(
+            f"[{agora()}] O arquivo {ARQUIVO_CSV} não existe. "
+            "Deseja criá-lo agora? [s/N] "
+        )
+    except EOFError:
+        resposta = ""
+
+    if resposta.strip().lower() not in {"s", "sim", "y", "yes"}:
+        print(
+            f"[{agora()}] Arquivo {ARQUIVO_CSV} não criado. "
+            "Encerrando para evitar perder registros de pesagem."
+        )
+        return False
+
+    ARQUIVO_CSV.parent.mkdir(parents=True, exist_ok=True)
+
+    with ARQUIVO_CSV.open("w", newline="", encoding="utf-8") as arquivo:
+        writer = csv.DictWriter(arquivo, fieldnames=CAMPOS_CSV)
+        writer.writeheader()
+
+    print(f"[{agora()}] Arquivo {ARQUIVO_CSV} criado com sucesso.")
+    return True
+
+
+def registrar_pesagem_csv(amostras):
     ARQUIVO_CSV.parent.mkdir(parents=True, exist_ok=True)
     arquivo_existe = ARQUIVO_CSV.exists() and ARQUIVO_CSV.stat().st_size > 0
 
     pesos = [peso_amostra for _, peso_amostra in amostras]
-    peso_minimo = min(pesos)
     peso_maximo = max(pesos)
-    oscilacao = peso_maximo - peso_minimo
-    peso_medido = round(sum(pesos) / len(pesos))
 
     with ARQUIVO_CSV.open("a", newline="", encoding="utf-8") as arquivo:
-        campos = [
-            "data_hora",
-            "peso_kg",
-            "ultima_leitura_kg",
-            "peso_minimo_janela_kg",
-            "peso_maximo_janela_kg",
-            "oscilacao_janela_kg",
-            "tempo_estabilidade_s",
-        ]
-        writer = csv.DictWriter(arquivo, fieldnames=campos)
+        writer = csv.DictWriter(arquivo, fieldnames=CAMPOS_CSV)
 
         if not arquivo_existe:
             writer.writeheader()
@@ -105,19 +125,13 @@ def registrar_pesagem_csv(ultima_leitura, amostras):
         writer.writerow(
             {
                 "data_hora": agora(),
-                "peso_kg": peso_medido,
-                "ultima_leitura_kg": ultima_leitura,
-                "peso_minimo_janela_kg": peso_minimo,
                 "peso_maximo_janela_kg": peso_maximo,
-                "oscilacao_janela_kg": oscilacao,
-                "tempo_estabilidade_s": TEMPO_ESTABILIDADE_SEGUNDOS,
             }
         )
 
     print(
         f"[{agora()}] Pesagem registrada em {ARQUIVO_CSV}: "
-        f"{peso_medido} kg | última leitura: {ultima_leitura} kg | "
-        f"oscilação na janela: {oscilacao} kg"
+        f"peso máximo da janela: {peso_maximo} kg"
     )
 
 
@@ -180,7 +194,7 @@ def avaliar_pesagem(peso):
     duracao_candidato = timestamp_atual - inicio_peso_candidato
 
     if duracao_candidato >= TEMPO_ESTABILIDADE_SEGUNDOS:
-        registrar_pesagem_csv(peso, list(amostras_estabilidade))
+        registrar_pesagem_csv(list(amostras_estabilidade))
         pesagem_registrada = True
         limpar_candidato()
         print(
@@ -252,6 +266,9 @@ def reconectar(ser, motivo):
 
 def main():
     global ultimo_dado_recebido, buffer
+
+    if not criar_arquivo_csv_com_permissao():
+        return
 
     ser = conectar()
 

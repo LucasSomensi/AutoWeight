@@ -532,13 +532,14 @@ A regra implementada é:
 
 1. Quando o peso fica acima de `1000 kg`, o script começa a observar as leituras.
 2. O peso só é considerado estabilizado quando, durante uma janela contínua de `10 segundos`, a diferença entre a menor e a maior leitura for de no máximo `20 kg`.
-3. Ao estabilizar, o script registra uma linha no arquivo local `pesagens.csv` com data/hora, peso medido e dados da janela de estabilidade.
-4. Para evitar registros repetidos do mesmo caminhão, o sistema só libera uma nova pesagem depois que o peso cair abaixo de `300 kg`.
+3. Se `pesagens.csv` ainda não existir, o script pede permissão para criá-lo antes de conectar à balança.
+4. Ao estabilizar, o script registra uma linha no arquivo local `pesagens.csv` somente com data/hora e o peso máximo observado na janela de estabilidade.
+5. Para evitar registros repetidos do mesmo caminhão, o sistema só libera uma nova pesagem depois que o peso cair abaixo de `300 kg`.
 
 Campos gravados no CSV:
 
 ```text
-data_hora,peso_kg,ultima_leitura_kg,peso_minimo_janela_kg,peso_maximo_janela_kg,oscilacao_janela_kg,tempo_estabilidade_s
+data_hora,peso_maximo_janela_kg
 ```
 
-O campo `peso_kg` é a média arredondada das leituras dentro da janela estável de 10 segundos. O campo `ultima_leitura_kg` mantém a última leitura recebida no momento do registro.
+O campo `peso_maximo_janela_kg` guarda a maior leitura recebida dentro da janela estável de 10 segundos.
