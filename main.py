@@ -1,7 +1,11 @@
-import serial
-import time
+import csv
 import re
+import time
+from collections import deque
 from datetime import datetime
+from pathlib import Path
+
+import serial
 from serial import SerialException
 
 PORTA = "COM3"
@@ -10,12 +14,21 @@ BAUDRATE = 9600
 INTERVALO_IMPRESSAO = 5
 TEMPO_SEM_DADOS_PARA_RECONECTAR = 15
 
+LIMITE_PESO_KG = 1000
+TEMPO_ESTABILIDADE_SEGUNDOS = 10
+OSCILACAO_MAXIMA_KG = 20
+PESO_RESET_KG = 300
+ARQUIVO_CSV = Path("pesagens.csv")
+
 PADRAO_PESO = re.compile(r"(ST|US),GS,([+-]\d+)kg")
 
-ultimo_peso = None
+ultimo_peso_impresso = None
 ultimo_print = 0
 ultimo_dado_recebido = time.time()
 buffer = ""
+
+amostras_estabilidade = deque()
+pesagem_registrada = False
 
 
 def agora():
@@ -36,7 +49,7 @@ def conectar():
                 write_timeout=1,
                 rtscts=False,
                 dsrdtr=False,
-                xonxoff=False
+                xonxoff=False,
             )
 
             ser.reset_input_buffer()
@@ -56,94 +69,225 @@ def extrair_peso(linha):
     if not match:
         return None
 
-    estabilidade = match.group(1)
+    status_balanca = match.group(1)
     peso = int(match.group(2))
 
-    return estabilidade, peso
+    return status_balanca, peso
 
 
-ser = conectar()
+def registrar_pesagem_csv(ultima_leitura, amostras):
+    ARQUIVO_CSV.parent.mkdir(parents=True, exist_ok=True)
+    arquivo_existe = ARQUIVO_CSV.exists() and ARQUIVO_CSV.stat().st_size > 0
 
-print(f"[{agora()}] Lendo balança. Ctrl+C para parar.")
+    pesos = [peso_amostra for _, peso_amostra in amostras]
+    peso_minimo = min(pesos)
+    peso_maximo = max(pesos)
+    oscilacao = peso_maximo - peso_minimo
+    peso_medido = round(sum(pesos) / len(pesos))
 
-try:
-    while True:
-        try:
-            n = ser.in_waiting
+    with ARQUIVO_CSV.open("a", newline="", encoding="utf-8") as arquivo:
+        campos = [
+            "data_hora",
+            "peso_kg",
+            "ultima_leitura_kg",
+            "peso_minimo_janela_kg",
+            "peso_maximo_janela_kg",
+            "oscilacao_janela_kg",
+            "tempo_estabilidade_s",
+        ]
+        writer = csv.DictWriter(arquivo, fieldnames=campos)
 
-            if n > 0:
-                dados = ser.read(n)
-                ultimo_dado_recebido = time.time()
+        if not arquivo_existe:
+            writer.writeheader()
 
-                texto = dados.decode("ascii", errors="replace")
-                buffer += texto
+        writer.writerow(
+            {
+                "data_hora": agora(),
+                "peso_kg": peso_medido,
+                "ultima_leitura_kg": ultima_leitura,
+                "peso_minimo_janela_kg": peso_minimo,
+                "peso_maximo_janela_kg": peso_maximo,
+                "oscilacao_janela_kg": oscilacao,
+                "tempo_estabilidade_s": TEMPO_ESTABILIDADE_SEGUNDOS,
+            }
+        )
 
-                # Divide em linhas completas
-                while "\n" in buffer or "\r" in buffer:
-                    buffer = buffer.replace("\r", "\n")
-                    partes = buffer.split("\n")
+    print(
+        f"[{agora()}] Pesagem registrada em {ARQUIVO_CSV}: "
+        f"{peso_medido} kg | última leitura: {ultima_leitura} kg | "
+        f"oscilação na janela: {oscilacao} kg"
+    )
 
-                    linhas_completas = partes[:-1]
-                    buffer = partes[-1]
 
-                    for linha in linhas_completas:
-                        linha = linha.strip()
+def limpar_amostras_antigas(timestamp_atual):
+    while amostras_estabilidade:
+        timestamp_amostra, _ = amostras_estabilidade[0]
 
-                        if not linha:
-                            continue
+        if timestamp_atual - timestamp_amostra <= TEMPO_ESTABILIDADE_SEGUNDOS:
+            break
 
-                        resultado = extrair_peso(linha)
+        amostras_estabilidade.popleft()
 
-                        if resultado is None:
-                            print(f"[{agora()}] Linha ignorada: {repr(linha)}")
-                            continue
 
-                        estabilidade, peso = resultado
+def avaliar_pesagem(peso):
+    global pesagem_registrada
 
-                        agora_time = time.time()
+    timestamp_atual = time.time()
 
-                        if peso != ultimo_peso and agora_time - ultimo_print >= INTERVALO_IMPRESSAO:
-                            print(f"[{agora()}] Peso: {peso} kg | status: {estabilidade}")
-                            ultimo_peso = peso
-                            ultimo_print = agora_time
+    if pesagem_registrada:
+        if peso < PESO_RESET_KG:
+            pesagem_registrada = False
+            amostras_estabilidade.clear()
+            print(
+                f"[{agora()}] Peso caiu para {peso} kg. "
+                "Sistema liberado para nova pesagem."
+            )
+        return
 
-            # Se ficou tempo demais sem receber nada, tenta reabrir a porta
-            tempo_sem_dados = time.time() - ultimo_dado_recebido
+    if peso <= LIMITE_PESO_KG:
+        if amostras_estabilidade:
+            print(
+                f"[{agora()}] Peso voltou para {peso} kg antes de estabilizar. "
+                "Aguardando nova entrada acima do limite."
+            )
+        amostras_estabilidade.clear()
+        return
 
-            if tempo_sem_dados > TEMPO_SEM_DADOS_PARA_RECONECTAR:
-                print(f"[{agora()}] Sem dados há {tempo_sem_dados:.1f}s. Reabrindo porta...")
+    amostras_estabilidade.append((timestamp_atual, peso))
+    limpar_amostras_antigas(timestamp_atual)
 
-                try:
-                    ser.close()
-                except:
-                    pass
+    if len(amostras_estabilidade) < 2:
+        print(
+            f"[{agora()}] Peso acima de {LIMITE_PESO_KG} kg. "
+            "Iniciando verificação de estabilidade."
+        )
+        return
 
-                time.sleep(2)
-                ser = conectar()
+    duracao_janela = timestamp_atual - amostras_estabilidade[0][0]
+    pesos_janela = [peso_amostra for _, peso_amostra in amostras_estabilidade]
+    peso_minimo = min(pesos_janela)
+    peso_maximo = max(pesos_janela)
+    oscilacao = peso_maximo - peso_minimo
 
-                ultimo_dado_recebido = time.time()
-                buffer = ""
+    if duracao_janela >= TEMPO_ESTABILIDADE_SEGUNDOS and oscilacao <= OSCILACAO_MAXIMA_KG:
+        registrar_pesagem_csv(peso, list(amostras_estabilidade))
+        pesagem_registrada = True
+        amostras_estabilidade.clear()
+        print(
+            f"[{agora()}] Aguardando peso cair abaixo de {PESO_RESET_KG} kg "
+            "para liberar a próxima pesagem."
+        )
 
-            time.sleep(0.05)
 
-        except SerialException as e:
-            print(f"[{agora()}] Erro serial: {repr(e)}. Reconectando...")
+def processar_linha(linha):
+    global ultimo_peso_impresso, ultimo_print
 
-            try:
-                ser.close()
-            except:
-                pass
+    resultado = extrair_peso(linha)
 
-            time.sleep(2)
-            ser = conectar()
-            ultimo_dado_recebido = time.time()
-            buffer = ""
+    if resultado is None:
+        print(f"[{agora()}] Linha ignorada: {repr(linha)}")
+        return
 
-except KeyboardInterrupt:
-    print(f"[{agora()}] Encerrando...")
+    status_balanca, peso = resultado
+    agora_time = time.time()
 
-finally:
+    if peso != ultimo_peso_impresso and agora_time - ultimo_print >= INTERVALO_IMPRESSAO:
+        print(
+            f"[{agora()}] Peso: {peso} kg | status recebido: {status_balanca} "
+            "| estabilidade calculada por oscilação real"
+        )
+        ultimo_peso_impresso = peso
+        ultimo_print = agora_time
+
+    avaliar_pesagem(peso)
+
+
+def processar_buffer():
+    global buffer
+
+    while "\n" in buffer or "\r" in buffer:
+        buffer = buffer.replace("\r", "\n")
+        partes = buffer.split("\n")
+
+        linhas_completas = partes[:-1]
+        buffer = partes[-1]
+
+        for linha in linhas_completas:
+            linha = linha.strip()
+
+            if not linha:
+                continue
+
+            processar_linha(linha)
+
+
+def reconectar(ser, motivo):
+    global ultimo_dado_recebido, buffer
+
+    print(f"[{agora()}] {motivo}. Reabrindo porta...")
+
     try:
         ser.close()
-    except:
+    except Exception:
         pass
+
+    time.sleep(2)
+    novo_ser = conectar()
+
+    ultimo_dado_recebido = time.time()
+    buffer = ""
+
+    return novo_ser
+
+
+def main():
+    global ultimo_dado_recebido, buffer
+
+    ser = conectar()
+
+    print(f"[{agora()}] Lendo balança. Ctrl+C para parar.")
+    print(
+        f"[{agora()}] MVP ativo: registra em {ARQUIVO_CSV} quando peso > "
+        f"{LIMITE_PESO_KG} kg e oscila no máximo {OSCILACAO_MAXIMA_KG} kg por "
+        f"{TEMPO_ESTABILIDADE_SEGUNDOS}s."
+    )
+
+    try:
+        while True:
+            try:
+                n = ser.in_waiting
+
+                if n > 0:
+                    dados = ser.read(n)
+                    ultimo_dado_recebido = time.time()
+
+                    texto = dados.decode("ascii", errors="replace")
+                    buffer += texto
+
+                    processar_buffer()
+
+                tempo_sem_dados = time.time() - ultimo_dado_recebido
+
+                if tempo_sem_dados > TEMPO_SEM_DADOS_PARA_RECONECTAR:
+                    ser = reconectar(
+                        ser,
+                        f"Sem dados há {tempo_sem_dados:.1f}s",
+                    )
+
+                time.sleep(0.05)
+
+            except SerialException as e:
+                ser = reconectar(ser, f"Erro serial: {repr(e)}")
+
+    except KeyboardInterrupt:
+        print(f"[{agora()}] Encerrando...")
+
+    finally:
+        try:
+            ser.close()
+        except Exception:
+            pass
+
+
+if __name__ == "__main__":
+    main()

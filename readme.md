@@ -514,3 +514,31 @@ Protocol: ASCII
 * Protocolo observado: ASCII com linhas terminadas em `\r\n`
 * Formato observado: `ST,GS,+0000000kg`
 * Problema em aberto: a comunicação para de receber bytes sem erro explícito na porta serial
+
+---
+
+## MVP atual: registro local de pesagens estabilizadas
+
+O script principal continua lendo a balança pela serial e interpretando linhas no formato já observado, como:
+
+```text
+ST,GS,+0002200kg
+US,GS,+0002200kg
+```
+
+Para este MVP, o status `ST`/`US` recebido da balança é usado apenas para diagnóstico no console. A decisão de estabilidade não confia nesse status.
+
+A regra implementada é:
+
+1. Quando o peso fica acima de `1000 kg`, o script começa a observar as leituras.
+2. O peso só é considerado estabilizado quando, durante uma janela contínua de `10 segundos`, a diferença entre a menor e a maior leitura for de no máximo `20 kg`.
+3. Ao estabilizar, o script registra uma linha no arquivo local `pesagens.csv` com data/hora, peso medido e dados da janela de estabilidade.
+4. Para evitar registros repetidos do mesmo caminhão, o sistema só libera uma nova pesagem depois que o peso cair abaixo de `300 kg`.
+
+Campos gravados no CSV:
+
+```text
+data_hora,peso_kg,ultima_leitura_kg,peso_minimo_janela_kg,peso_maximo_janela_kg,oscilacao_janela_kg,tempo_estabilidade_s
+```
+
+O campo `peso_kg` é a média arredondada das leituras dentro da janela estável de 10 segundos. O campo `ultima_leitura_kg` mantém a última leitura recebida no momento do registro.
