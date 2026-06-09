@@ -19,6 +19,7 @@ TEMPO_ESTABILIDADE_SEGUNDOS = 10
 OSCILACAO_MAXIMA_KG = 20
 PESO_RESET_KG = 300
 ARQUIVO_CSV = Path("pesagens.csv")
+DELIMITADOR_CSV = ";"
 
 PADRAO_PESO = re.compile(r"(ST|US),GS,([+-]\d+)kg")
 
@@ -31,6 +32,7 @@ amostras_estabilidade = deque()
 peso_candidato = None
 inicio_peso_candidato = None
 pesagem_registrada = False
+ultima_pesagem_registrada_kg = None
 
 
 def agora():
@@ -102,37 +104,73 @@ def criar_arquivo_csv_com_permissao():
     ARQUIVO_CSV.parent.mkdir(parents=True, exist_ok=True)
 
     with ARQUIVO_CSV.open("w", newline="", encoding="utf-8") as arquivo:
-        writer = csv.DictWriter(arquivo, fieldnames=CAMPOS_CSV)
+        writer = csv.DictWriter(
+            arquivo, fieldnames=CAMPOS_CSV, delimiter=DELIMITADOR_CSV
+        )
         writer.writeheader()
 
     print(f"[{agora()}] Arquivo {ARQUIVO_CSV} criado com sucesso.")
     return True
 
 
-def registrar_pesagem_csv(amostras):
+def escrever_linhas_csv(linhas):
+    ARQUIVO_CSV.parent.mkdir(parents=True, exist_ok=True)
+
+    with ARQUIVO_CSV.open("w", newline="", encoding="utf-8") as arquivo:
+        writer = csv.DictWriter(
+            arquivo, fieldnames=CAMPOS_CSV, delimiter=DELIMITADOR_CSV
+        )
+        writer.writeheader()
+        writer.writerows(linhas)
+
+
+def ler_linhas_csv():
+    if not ARQUIVO_CSV.exists() or ARQUIVO_CSV.stat().st_size == 0:
+        return []
+
+    with ARQUIVO_CSV.open("r", newline="", encoding="utf-8") as arquivo:
+        reader = csv.DictReader(arquivo, delimiter=DELIMITADOR_CSV)
+        return list(reader)
+
+
+def registrar_pesagem_csv(amostras, substituir_ultima=False):
     ARQUIVO_CSV.parent.mkdir(parents=True, exist_ok=True)
     arquivo_existe = ARQUIVO_CSV.exists() and ARQUIVO_CSV.stat().st_size > 0
 
     pesos = [peso_amostra for _, peso_amostra in amostras]
     peso_maximo = max(pesos)
+    linha = {
+        "data_hora": agora(),
+        "peso_maximo_janela_kg": peso_maximo,
+    }
+
+    if substituir_ultima and arquivo_existe:
+        linhas = ler_linhas_csv()
+
+        if linhas:
+            linhas[-1] = linha
+            escrever_linhas_csv(linhas)
+            print(
+                f"[{agora()}] Última pesagem substituída em {ARQUIVO_CSV}: "
+                f"novo peso máximo da janela: {peso_maximo} kg"
+            )
+            return peso_maximo
 
     with ARQUIVO_CSV.open("a", newline="", encoding="utf-8") as arquivo:
-        writer = csv.DictWriter(arquivo, fieldnames=CAMPOS_CSV)
+        writer = csv.DictWriter(
+            arquivo, fieldnames=CAMPOS_CSV, delimiter=DELIMITADOR_CSV
+        )
 
         if not arquivo_existe:
             writer.writeheader()
 
-        writer.writerow(
-            {
-                "data_hora": agora(),
-                "peso_maximo_janela_kg": peso_maximo,
-            }
-        )
+        writer.writerow(linha)
 
     print(
         f"[{agora()}] Pesagem registrada em {ARQUIVO_CSV}: "
         f"peso máximo da janela: {peso_maximo} kg"
     )
+    return peso_maximo
 
 
 def limpar_candidato():
@@ -145,20 +183,32 @@ def limpar_candidato():
 
 def avaliar_pesagem(peso):
     global pesagem_registrada, peso_candidato, inicio_peso_candidato
+    global ultima_pesagem_registrada_kg
 
     timestamp_atual = time.time()
+    substituir_ultima = False
 
     if pesagem_registrada:
         if peso < PESO_RESET_KG:
             pesagem_registrada = False
+            ultima_pesagem_registrada_kg = None
             limpar_candidato()
             print(
                 f"[{agora()}] Peso caiu para {peso} kg. "
                 "Sistema liberado para nova pesagem."
             )
-        return
+            return
 
-    if peso <= LIMITE_PESO_KG:
+        if (
+            ultima_pesagem_registrada_kg is None
+            or peso <= ultima_pesagem_registrada_kg
+        ):
+            limpar_candidato()
+            return
+
+        substituir_ultima = True
+
+    elif peso <= LIMITE_PESO_KG:
         if peso_candidato is not None:
             print(
                 f"[{agora()}] Peso voltou para {peso} kg antes de estabilizar. "
@@ -171,10 +221,18 @@ def avaliar_pesagem(peso):
         peso_candidato = peso
         inicio_peso_candidato = timestamp_atual
         amostras_estabilidade.append((timestamp_atual, peso))
-        print(
-            f"[{agora()}] Peso acima de {LIMITE_PESO_KG} kg. "
-            f"Candidato estável iniciado em {peso_candidato} kg."
-        )
+
+        if substituir_ultima:
+            print(
+                f"[{agora()}] Peso acima do último registro "
+                f"({ultima_pesagem_registrada_kg} kg). "
+                f"Candidato de substituição iniciado em {peso_candidato} kg."
+            )
+        else:
+            print(
+                f"[{agora()}] Peso acima de {LIMITE_PESO_KG} kg. "
+                f"Candidato estável iniciado em {peso_candidato} kg."
+            )
         return
 
     if abs(peso - peso_candidato) <= OSCILACAO_MAXIMA_KG:
@@ -194,7 +252,10 @@ def avaliar_pesagem(peso):
     duracao_candidato = timestamp_atual - inicio_peso_candidato
 
     if duracao_candidato >= TEMPO_ESTABILIDADE_SEGUNDOS:
-        registrar_pesagem_csv(list(amostras_estabilidade))
+        ultima_pesagem_registrada_kg = registrar_pesagem_csv(
+            list(amostras_estabilidade),
+            substituir_ultima=substituir_ultima,
+        )
         pesagem_registrada = True
         limpar_candidato()
         print(
