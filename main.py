@@ -28,6 +28,8 @@ ultimo_dado_recebido = time.time()
 buffer = ""
 
 amostras_estabilidade = deque()
+peso_candidato = None
+inicio_peso_candidato = None
 pesagem_registrada = False
 
 
@@ -119,25 +121,23 @@ def registrar_pesagem_csv(ultima_leitura, amostras):
     )
 
 
-def limpar_amostras_antigas(timestamp_atual):
-    while amostras_estabilidade:
-        timestamp_amostra, _ = amostras_estabilidade[0]
+def limpar_candidato():
+    global peso_candidato, inicio_peso_candidato
 
-        if timestamp_atual - timestamp_amostra <= TEMPO_ESTABILIDADE_SEGUNDOS:
-            break
-
-        amostras_estabilidade.popleft()
+    peso_candidato = None
+    inicio_peso_candidato = None
+    amostras_estabilidade.clear()
 
 
 def avaliar_pesagem(peso):
-    global pesagem_registrada
+    global pesagem_registrada, peso_candidato, inicio_peso_candidato
 
     timestamp_atual = time.time()
 
     if pesagem_registrada:
         if peso < PESO_RESET_KG:
             pesagem_registrada = False
-            amostras_estabilidade.clear()
+            limpar_candidato()
             print(
                 f"[{agora()}] Peso caiu para {peso} kg. "
                 "Sistema liberado para nova pesagem."
@@ -145,34 +145,44 @@ def avaliar_pesagem(peso):
         return
 
     if peso <= LIMITE_PESO_KG:
-        if amostras_estabilidade:
+        if peso_candidato is not None:
             print(
                 f"[{agora()}] Peso voltou para {peso} kg antes de estabilizar. "
                 "Aguardando nova entrada acima do limite."
             )
-        amostras_estabilidade.clear()
+        limpar_candidato()
         return
 
-    amostras_estabilidade.append((timestamp_atual, peso))
-    limpar_amostras_antigas(timestamp_atual)
-
-    if len(amostras_estabilidade) < 2:
+    if peso_candidato is None:
+        peso_candidato = peso
+        inicio_peso_candidato = timestamp_atual
+        amostras_estabilidade.append((timestamp_atual, peso))
         print(
             f"[{agora()}] Peso acima de {LIMITE_PESO_KG} kg. "
-            "Iniciando verificação de estabilidade."
+            f"Candidato estável iniciado em {peso_candidato} kg."
         )
         return
 
-    duracao_janela = timestamp_atual - amostras_estabilidade[0][0]
-    pesos_janela = [peso_amostra for _, peso_amostra in amostras_estabilidade]
-    peso_minimo = min(pesos_janela)
-    peso_maximo = max(pesos_janela)
-    oscilacao = peso_maximo - peso_minimo
+    if abs(peso - peso_candidato) <= OSCILACAO_MAXIMA_KG:
+        amostras_estabilidade.append((timestamp_atual, peso))
+    else:
+        print(
+            f"[{agora()}] Peso {peso} kg saiu da faixa do candidato "
+            f"{peso_candidato} kg (+/- {OSCILACAO_MAXIMA_KG} kg). "
+            "Reiniciando cronômetro de estabilidade."
+        )
+        peso_candidato = peso
+        inicio_peso_candidato = timestamp_atual
+        amostras_estabilidade.clear()
+        amostras_estabilidade.append((timestamp_atual, peso))
+        return
 
-    if duracao_janela >= TEMPO_ESTABILIDADE_SEGUNDOS and oscilacao <= OSCILACAO_MAXIMA_KG:
+    duracao_candidato = timestamp_atual - inicio_peso_candidato
+
+    if duracao_candidato >= TEMPO_ESTABILIDADE_SEGUNDOS:
         registrar_pesagem_csv(peso, list(amostras_estabilidade))
         pesagem_registrada = True
-        amostras_estabilidade.clear()
+        limpar_candidato()
         print(
             f"[{agora()}] Aguardando peso cair abaixo de {PESO_RESET_KG} kg "
             "para liberar a próxima pesagem."
@@ -194,7 +204,7 @@ def processar_linha(linha):
     if peso != ultimo_peso_impresso and agora_time - ultimo_print >= INTERVALO_IMPRESSAO:
         print(
             f"[{agora()}] Peso: {peso} kg | status recebido: {status_balanca} "
-            "| estabilidade calculada por oscilação real"
+            "| estabilidade calculada por faixa candidata"
         )
         ultimo_peso_impresso = peso
         ultimo_print = agora_time
@@ -248,7 +258,8 @@ def main():
     print(f"[{agora()}] Lendo balança. Ctrl+C para parar.")
     print(
         f"[{agora()}] MVP ativo: registra em {ARQUIVO_CSV} quando peso > "
-        f"{LIMITE_PESO_KG} kg e oscila no máximo {OSCILACAO_MAXIMA_KG} kg por "
+        f"{LIMITE_PESO_KG} kg e permanece dentro de +/- "
+        f"{OSCILACAO_MAXIMA_KG} kg do candidato por "
         f"{TEMPO_ESTABILIDADE_SEGUNDOS}s."
     )
 
