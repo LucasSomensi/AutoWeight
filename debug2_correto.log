@@ -1,0 +1,751 @@
+
+[2026-06-15 14:52:29.378] ================================================================================
+[2026-06-15 14:52:29.380] INÍCIO DO DEBUG2 DA BALANÇA
+[2026-06-15 14:52:29.380] ================================================================================
+[2026-06-15 14:52:29.382] Arquivo de log: D:\OneDrive\Documentos\Códigos\debug2_DESKTOP-FJ69N4K_20260615_145229.log
+[2026-06-15 14:52:29.383] Arquivo CSV resumo: D:\OneDrive\Documentos\Códigos\debug2_DESKTOP-FJ69N4K_20260615_145229.csv
+[2026-06-15 14:52:29.383] Rode este script nos dois computadores com a mesma balança/cabo/adaptador, se possível.
+[2026-06-15 14:52:29.383] Depois envie o .log e o .csv de cada computador para comparação.
+
+[2026-06-15 14:52:29.394] ================================================================================
+[2026-06-15 14:52:29.394] INFORMAÇÕES DO SISTEMA
+[2026-06-15 14:52:29.395] ================================================================================
+[2026-06-15 14:52:29.479] {
+  "hostname": "DESKTOP-FJ69N4K",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "system": "Windows",
+  "release": "10",
+  "version": "10.0.19045",
+  "machine": "AMD64",
+  "processor": "Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",
+  "python_executable": "C:\\Program Files\\Python313\\python.exe",
+  "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "cwd": "D:\\OneDrive\\Documentos\\Códigos",
+  "pyserial_version": "3.5"
+}
+
+[2026-06-15 14:52:29.482] ================================================================================
+[2026-06-15 14:52:29.482] VARIÁVEIS DE AMBIENTE RELEVANTES
+[2026-06-15 14:52:29.483] ================================================================================
+[2026-06-15 14:52:29.483] PATH=C:\Program Files\Microsoft MPI\Bin\;C:\Program Files\Python313\Scripts\;C:\Program Files\Python313\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\Program Files\Git\cmd;C:\Program Files (x86)\Microsoft SQL Server\160\Tools\Binn\;C:\Program Files\Microsoft SQL Server\160\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\Microsoft SQL Server\160\DTS\Binn\;C:\Program Files\MySQL\MySQL Shell 8.0\bin\;C:\Users\Lucas\AppData\Local\Microsoft\WindowsApps;C:\Users\Lucas\AppData\Roaming\npm
+
+[2026-06-15 14:52:29.484] ================================================================================
+[2026-06-15 14:52:29.484] PORTAS SERIAIS DETECTADAS PELO PYSERIAL
+[2026-06-15 14:52:29.485] ================================================================================
+[2026-06-15 14:52:29.499] PORTA #1
+[2026-06-15 14:52:29.499] {
+  "device": "COM1",
+  "name": "COM1",
+  "description": "Communications Port (COM1)",
+  "hwid": "ACPI\\PNP0501\\0",
+  "vid": null,
+  "pid": null,
+  "serial_number": null,
+  "location": null,
+  "manufacturer": "(Tipos de porta padrão)",
+  "product": null,
+  "interface": null
+}
+[2026-06-15 14:52:29.500] PORTA #2
+[2026-06-15 14:52:29.500] {
+  "device": "COM3",
+  "name": "COM3",
+  "description": "USB Serial Port (COM3)",
+  "hwid": "USB VID:PID=0403:6001 SER=A9O5HZZNA",
+  "vid": "0x0403",
+  "pid": "0x6001",
+  "serial_number": "A9O5HZZNA",
+  "location": null,
+  "manufacturer": "FTDI",
+  "product": null,
+  "interface": null
+}
+
+[2026-06-15 14:52:29.504] ================================================================================
+[2026-06-15 14:52:29.504] COMANDOS DO SISTEMA / USB / SERIAL
+[2026-06-15 14:52:29.505] ================================================================================
+[2026-06-15 14:52:29.505] $ where python
+[2026-06-15 14:52:29.613] exit_code=0
+[2026-06-15 14:52:29.613]   C:\Program Files\Python313\python.exe
+[2026-06-15 14:52:29.614]   C:\Users\Lucas\AppData\Local\Microsoft\WindowsApps\python.exe
+[2026-06-15 14:52:29.615] $ python -m pip show pyserial
+[2026-06-15 14:52:30.319] exit_code=0
+[2026-06-15 14:52:30.320]   Name: pyserial
+[2026-06-15 14:52:30.321]   Version: 3.5
+[2026-06-15 14:52:30.321]   Summary: Python Serial Port Extension
+[2026-06-15 14:52:30.322]   Home-page: https://github.com/pyserial/pyserial
+[2026-06-15 14:52:30.322]   Author: Chris Liechti
+[2026-06-15 14:52:30.323]   Author-email: cliechti@gmx.net
+[2026-06-15 14:52:30.323]   License: BSD
+[2026-06-15 14:52:30.324]   Location: C:\Users\Lucas\AppData\Roaming\Python\Python313\site-packages
+[2026-06-15 14:52:30.324]   Requires: 
+[2026-06-15 14:52:30.324]   Required-by:
+[2026-06-15 14:52:30.325] $ mode
+[2026-06-15 14:52:30.327] exit_code=None
+[2026-06-15 14:52:30.327]   FileNotFoundError: FileNotFoundError(2, 'O sistema não pode encontrar o arquivo especificado', None, 2, None)
+[2026-06-15 14:52:30.328] $ powershell -NoProfile -Command Get-CimInstance Win32_SerialPort | Format-List *
+[2026-06-15 14:52:31.684] exit_code=0
+[2026-06-15 14:52:31.684]   Caption                     : Communications Port (COM1)
+[2026-06-15 14:52:31.685]   Description                 : Porta de comunica‡ao
+[2026-06-15 14:52:31.686]   InstallDate                 : 
+[2026-06-15 14:52:31.687]   Name                        : Communications Port (COM1)
+[2026-06-15 14:52:31.688]   Status                      : OK
+[2026-06-15 14:52:31.688]   Availability                : 2
+[2026-06-15 14:52:31.689]   ConfigManagerErrorCode      : 0
+[2026-06-15 14:52:31.690]   ConfigManagerUserConfig     : False
+[2026-06-15 14:52:31.691]   CreationClassName           : Win32_SerialPort
+[2026-06-15 14:52:31.692]   DeviceID                    : COM1
+[2026-06-15 14:52:31.693]   ErrorCleared                : 
+[2026-06-15 14:52:31.693]   ErrorDescription            : 
+[2026-06-15 14:52:31.694]   LastErrorCode               : 
+[2026-06-15 14:52:31.694]   PNPDeviceID                 : ACPI\PNP0501\0
+[2026-06-15 14:52:31.696]   PowerManagementCapabilities : {1}
+[2026-06-15 14:52:31.697]   PowerManagementSupported    : False
+[2026-06-15 14:52:31.698]   StatusInfo                  : 3
+[2026-06-15 14:52:31.698]   SystemCreationClassName     : Win32_ComputerSystem
+[2026-06-15 14:52:31.699]   SystemName                  : DESKTOP-FJ69N4K
+[2026-06-15 14:52:31.700]   MaxNumberControlled         : 
+[2026-06-15 14:52:31.701]   ProtocolSupported           : 
+[2026-06-15 14:52:31.701]   TimeOfLastReset             : 
+[2026-06-15 14:52:31.702]   Capabilities                : 
+[2026-06-15 14:52:31.703]   CapabilityDescriptions      : 
+[2026-06-15 14:52:31.704]   MaxBaudRate                 : 115200
+[2026-06-15 14:52:31.704]   Binary                      : True
+[2026-06-15 14:52:31.705]   MaximumInputBufferSize      : 0
+[2026-06-15 14:52:31.707]   MaximumOutputBufferSize     : 0
+[2026-06-15 14:52:31.708]   OSAutoDiscovered            : True
+[2026-06-15 14:52:31.709]   ProviderType                : RS232 Serial Port
+[2026-06-15 14:52:31.709]   SettableBaudRate            : True
+[2026-06-15 14:52:31.710]   SettableDataBits            : True
+[2026-06-15 14:52:31.711]   SettableFlowControl         : True
+[2026-06-15 14:52:31.711]   SettableParity              : True
+[2026-06-15 14:52:31.712]   SettableParityCheck         : True
+[2026-06-15 14:52:31.713]   SettableRLSD                : True
+[2026-06-15 14:52:31.713]   SettableStopBits            : True
+[2026-06-15 14:52:31.714]   Supports16BitMode           : False
+[2026-06-15 14:52:31.715]   SupportsDTRDSR              : True
+[2026-06-15 14:52:31.716]   SupportsElapsedTimeouts     : True
+[2026-06-15 14:52:31.717]   SupportsIntTimeouts         : True
+[2026-06-15 14:52:31.718]   SupportsParityCheck         : True
+[2026-06-15 14:52:31.718]   SupportsRLSD                : True
+[2026-06-15 14:52:31.719]   SupportsRTSCTS              : True
+[2026-06-15 14:52:31.720]   SupportsSpecialCharacters   : False
+[2026-06-15 14:52:31.721]   SupportsXOnXOff             : True
+[2026-06-15 14:52:31.723]   SupportsXOnXOffSet          : True
+[2026-06-15 14:52:31.724]   PSComputerName              : 
+[2026-06-15 14:52:31.725]   CimClass                    : root/cimv2:Win32_SerialPort
+[2026-06-15 14:52:31.725]   CimInstanceProperties       : {Caption, Description, InstallDate, Name...}
+[2026-06-15 14:52:31.726]   CimSystemProperties         : Microsoft.Management.Infrastructure.CimSystemProperties
+[2026-06-15 14:52:31.726] $ powershell -NoProfile -Command Get-PnpDevice -Class Ports | Format-List *
+[2026-06-15 14:52:33.257] exit_code=0
+[2026-06-15 14:52:33.258]   Class                       : Ports
+[2026-06-15 14:52:33.259]   FriendlyName                : Communications Port (COM1)
+[2026-06-15 14:52:33.259]   InstanceId                  : ACPI\PNP0501\0
+[2026-06-15 14:52:33.260]   Problem                     : CM_PROB_NONE
+[2026-06-15 14:52:33.261]   ConfigManagerErrorCode      : CM_PROB_NONE
+[2026-06-15 14:52:33.261]   ProblemDescription          : 
+[2026-06-15 14:52:33.262]   Caption                     : Communications Port (COM1)
+[2026-06-15 14:52:33.262]   Description                 : Porta de comunica‡ao
+[2026-06-15 14:52:33.263]   InstallDate                 : 
+[2026-06-15 14:52:33.263]   Name                        : Communications Port (COM1)
+[2026-06-15 14:52:33.264]   Status                      : OK
+[2026-06-15 14:52:33.264]   Availability                : 
+[2026-06-15 14:52:33.265]   ConfigManagerUserConfig     : False
+[2026-06-15 14:52:33.266]   CreationClassName           : Win32_PnPEntity
+[2026-06-15 14:52:33.266]   DeviceID                    : ACPI\PNP0501\0
+[2026-06-15 14:52:33.267]   ErrorCleared                : 
+[2026-06-15 14:52:33.267]   ErrorDescription            : 
+[2026-06-15 14:52:33.268]   LastErrorCode               : 
+[2026-06-15 14:52:33.269]   PNPDeviceID                 : ACPI\PNP0501\0
+[2026-06-15 14:52:33.269]   PowerManagementCapabilities : 
+[2026-06-15 14:52:33.270]   PowerManagementSupported    : 
+[2026-06-15 14:52:33.272]   StatusInfo                  : 
+[2026-06-15 14:52:33.273]   SystemCreationClassName     : Win32_ComputerSystem
+[2026-06-15 14:52:33.273]   SystemName                  : DESKTOP-FJ69N4K
+[2026-06-15 14:52:33.274]   ClassGuid                   : {4d36e978-e325-11ce-bfc1-08002be10318}
+[2026-06-15 14:52:33.274]   CompatibleID                : 
+[2026-06-15 14:52:33.275]   HardwareID                  : {ACPI\VEN_PNP&DEV_0501, ACPI\PNP0501, *PNP0501}
+[2026-06-15 14:52:33.276]   Manufacturer                : (Tipos de porta padrao)
+[2026-06-15 14:52:33.276]   PNPClass                    : Ports
+[2026-06-15 14:52:33.277]   Present                     : True
+[2026-06-15 14:52:33.277]   Service                     : Serial
+[2026-06-15 14:52:33.278]   PSComputerName              : 
+[2026-06-15 14:52:33.279]   CimClass                    : ROOT/cimv2:Win32_PnPEntity
+[2026-06-15 14:52:33.279]   CimInstanceProperties       : {Caption, Description, InstallDate, Name...}
+[2026-06-15 14:52:33.279]   CimSystemProperties         : Microsoft.Management.Infrastructure.CimSystemProperties
+[2026-06-15 14:52:33.280]   
+[2026-06-15 14:52:33.280]   Class                       : Ports
+[2026-06-15 14:52:33.281]   FriendlyName                : USB Serial Port (COM3)
+[2026-06-15 14:52:33.281]   InstanceId                  : FTDIBUS\VID_0403+PID_6001+A9O5HZZNA\0000
+[2026-06-15 14:52:33.282]   Problem                     : CM_PROB_NONE
+[2026-06-15 14:52:33.283]   ConfigManagerErrorCode      : CM_PROB_NONE
+[2026-06-15 14:52:33.283]   ProblemDescription          : 
+[2026-06-15 14:52:33.284]   Caption                     : USB Serial Port (COM3)
+[2026-06-15 14:52:33.284]   Description                 : USB Serial Port
+[2026-06-15 14:52:33.285]   InstallDate                 : 
+[2026-06-15 14:52:33.286]   Name                        : USB Serial Port (COM3)
+[2026-06-15 14:52:33.288]   Status                      : OK
+[2026-06-15 14:52:33.288]   Availability                : 
+[2026-06-15 14:52:33.289]   ConfigManagerUserConfig     : False
+[2026-06-15 14:52:33.290]   CreationClassName           : Win32_PnPEntity
+[2026-06-15 14:52:33.290]   DeviceID                    : FTDIBUS\VID_0403+PID_6001+A9O5HZZNA\0000
+[2026-06-15 14:52:33.291]   ErrorCleared                : 
+[2026-06-15 14:52:33.291]   ErrorDescription            : 
+[2026-06-15 14:52:33.292]   LastErrorCode               : 
+[2026-06-15 14:52:33.293]   PNPDeviceID                 : FTDIBUS\VID_0403+PID_6001+A9O5HZZNA\0000
+[2026-06-15 14:52:33.293]   PowerManagementCapabilities : 
+[2026-06-15 14:52:33.294]   PowerManagementSupported    : 
+[2026-06-15 14:52:33.294]   StatusInfo                  : 
+[2026-06-15 14:52:33.295]   SystemCreationClassName     : Win32_ComputerSystem
+[2026-06-15 14:52:33.295]   SystemName                  : DESKTOP-FJ69N4K
+[2026-06-15 14:52:33.296]   ClassGuid                   : {4d36e978-e325-11ce-bfc1-08002be10318}
+[2026-06-15 14:52:33.297]   CompatibleID                : 
+[2026-06-15 14:52:33.297]   HardwareID                  : {FTDIBUS\COMPORT&VID_0403&PID_6001}
+[2026-06-15 14:52:33.298]   Manufacturer                : FTDI
+[2026-06-15 14:52:33.298]   PNPClass                    : Ports
+[2026-06-15 14:52:33.299]   Present                     : True
+[2026-06-15 14:52:33.300]   Service                     : FTSER2K
+[2026-06-15 14:52:33.300]   PSComputerName              : 
+[2026-06-15 14:52:33.301]   CimClass                    : ROOT/cimv2:Win32_PnPEntity
+[2026-06-15 14:52:33.303]   CimInstanceProperties       : {Caption, Description, InstallDate, Name...}
+[2026-06-15 14:52:33.304]   CimSystemProperties         : Microsoft.Management.Infrastructure.CimSystemProperties
+[2026-06-15 14:52:33.304] $ powershell -NoProfile -Command Get-PnpDevice -Class USB | Format-Table -AutoSize
+[2026-06-15 14:52:34.302] exit_code=0
+[2026-06-15 14:52:34.303]   Status  Class FriendlyName                                                  InstanceId                                 
+[2026-06-15 14:52:34.304]   ------  ----- ------------                                                  ----------                                 
+[2026-06-15 14:52:34.305]   OK      USB   USB Root Hub (USB 3.0)                                        USB\ROOT_HUB30\4&1148BC98&0&0              
+[2026-06-15 14:52:34.305]   Unknown USB   Suporte de impressao USB                                      USB\VID_04B8&PID_0E27\58355A372803450000   
+[2026-06-15 14:52:34.306]   OK      USB   USB Mass Storage Device                                       USB\VID_03F0&PID_DB07\000000000000AA210A...
+[2026-06-15 14:52:34.307]   OK      USB   Intel(R) USB 3.0 eXtensible Host Controller - 1.0 (Microsoft) PCI\VEN_8086&DEV_A12F&SUBSYS_86941043&RE...
+[2026-06-15 14:52:34.307]   OK      USB   USB Composite Device                                          USB\VID_046D&PID_C52B\5&521A615&0&7        
+[2026-06-15 14:52:34.308]   Unknown USB   USB Composite Device                                          USB\VID_03F0&PID_F22A\BRBSR1R00Y           
+[2026-06-15 14:52:34.308]   OK      USB   USB Serial Converter                                          USB\VID_0403&PID_6001\A9O5HZZN             
+[2026-06-15 14:52:34.309]   Unknown USB   Suporte de impressao USB                                      USB\VID_03F0&PID_F22A&MI_01\6&15BDA6F6&5...
+
+[2026-06-15 14:52:34.310] ================================================================================
+[2026-06-15 14:52:34.311] PORTAS SELECIONADAS PARA TESTE
+[2026-06-15 14:52:34.312] ================================================================================
+[2026-06-15 14:52:34.312] COM3
+
+[2026-06-15 14:52:34.313] ================================================================================
+[2026-06-15 14:52:34.314] TESTE DE LEITURA SERIAL: porta=COM3 baudrate=9600 duração=120s
+[2026-06-15 14:52:34.315] ================================================================================
+[2026-06-15 14:52:34.324] Porta aberta.
+[2026-06-15 14:52:34.324] Status inicial: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:52:34.325] Buffers limpos.
+[2026-06-15 14:52:34.337] BLOCO #1: 1 bytes | hex=7f | ascii='\x7f'
+[2026-06-15 14:52:34.646] BLOCO #2: 3 bytes | hex=53 54 2c | ascii='ST,'
+[2026-06-15 14:52:34.658] BLOCO #3: 15 bytes | hex=47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='GS,+0000000kg\r\n'
+[2026-06-15 14:52:34.659] LINHA VÁLIDA #1: '\x7fST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:52:34.976] BLOCO #4: 7 bytes | hex=53 54 2c 47 53 2c 2b | ascii='ST,GS,+'
+[2026-06-15 14:52:34.998] BLOCO #5: 11 bytes | hex=30 30 30 30 30 30 30 6b 67 0d 0a | ascii='0000000kg\r\n'
+[2026-06-15 14:52:34.999] LINHA VÁLIDA #2: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:52:35.320] BLOCO #6: 10 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 | ascii='ST,GS,+000'
+[2026-06-15 14:52:35.332] BLOCO #7: 8 bytes | hex=30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\n'
+[2026-06-15 14:52:35.334] LINHA VÁLIDA #3: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:52:35.654] BLOCO #8: 13 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 | ascii='ST,GS,+000000'
+[2026-06-15 14:52:35.666] BLOCO #9: 5 bytes | hex=30 6b 67 0d 0a | ascii='0kg\r\n'
+[2026-06-15 14:52:35.667] LINHA VÁLIDA #4: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:52:35.989] BLOCO #10: 15 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b | ascii='ST,GS,+0000000k'
+[2026-06-15 14:52:36.000] BLOCO #11: 3 bytes | hex=67 0d 0a | ascii='g\r\n'
+[2026-06-15 14:52:36.001] LINHA VÁLIDA #5: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:52:36.314] BLOCO #12: 2 bytes | hex=53 54 | ascii='ST'
+[2026-06-15 14:52:36.326] BLOCO #13: 16 bytes | hex=2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii=',GS,+0000000kg\r\n'
+[2026-06-15 14:52:36.328] LINHA VÁLIDA #6: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:52:36.652] BLOCO #14: 7 bytes | hex=53 54 2c 47 53 2c 2b | ascii='ST,GS,+'
+[2026-06-15 14:52:39.329] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:52:39.403] BLOCO #15: 11 bytes | hex=30 30 30 30 30 30 30 6b 67 0d 0a | ascii='0000000kg\r\n'
+[2026-06-15 14:52:39.406] LINHA VÁLIDA #7: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:52:44.328] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:52:49.328] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:52:54.334] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:52:59.326] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:53:04.335] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:53:09.331] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:53:14.327] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:53:15.200] BLOCO #16: 376 bytes | hex=30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0a 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 0a 30 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 0a 30 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 0a 30 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\n\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,\n0ST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,\n0ST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,\n0ST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\n'
+[2026-06-15 14:53:15.219] LINHA INVÁLIDA #1: '000000kg'
+[2026-06-15 14:53:15.221] LINHA VÁLIDA #8: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.223] LINHA VÁLIDA #9: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.226] LINHA VÁLIDA #10: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.228] LINHA VÁLIDA #11: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.230] LINHA INVÁLIDA #2: ''
+[2026-06-15 14:53:15.236] LINHA VÁLIDA #12: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.239] LINHA VÁLIDA #13: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.243] LINHA VÁLIDA #14: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.246] LINHA INVÁLIDA #3: 'ST,GS,'
+[2026-06-15 14:53:15.248] LINHA VÁLIDA #15: '0ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.253] LINHA VÁLIDA #16: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.255] LINHA VÁLIDA #17: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.259] LINHA INVÁLIDA #4: 'ST,GS,'
+[2026-06-15 14:53:15.262] LINHA VÁLIDA #18: '0ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.264] LINHA VÁLIDA #19: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.265] LINHA VÁLIDA #20: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.266] LINHA INVÁLIDA #5: 'ST,GS,'
+[2026-06-15 14:53:15.267] LINHA VÁLIDA #21: '0ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.268] LINHA VÁLIDA #22: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.269] LINHA VÁLIDA #23: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.270] LINHA VÁLIDA #24: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.272] LINHA VÁLIDA #25: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.273] LINHA VÁLIDA #26: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.326] BLOCO #17: 15 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b | ascii='ST,GS,+0000000k'
+[2026-06-15 14:53:15.337] BLOCO #18: 3 bytes | hex=67 0d 0a | ascii='g\r\n'
+[2026-06-15 14:53:15.338] LINHA VÁLIDA #27: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.642] BLOCO #19: 3 bytes | hex=53 54 2c | ascii='ST,'
+[2026-06-15 14:53:15.654] BLOCO #20: 15 bytes | hex=47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='GS,+0000000kg\r\n'
+[2026-06-15 14:53:15.656] LINHA VÁLIDA #28: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:15.975] BLOCO #21: 6 bytes | hex=53 54 2c 47 53 2c | ascii='ST,GS,'
+[2026-06-15 14:53:15.997] BLOCO #22: 12 bytes | hex=2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='+0000000kg\r\n'
+[2026-06-15 14:53:15.997] LINHA VÁLIDA #29: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:16.315] BLOCO #23: 10 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 | ascii='ST,GS,+000'
+[2026-06-15 14:53:16.326] BLOCO #24: 8 bytes | hex=30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\n'
+[2026-06-15 14:53:16.326] LINHA VÁLIDA #30: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:16.653] BLOCO #25: 12 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 | ascii='ST,GS,+00000'
+[2026-06-15 14:53:16.664] BLOCO #26: 6 bytes | hex=30 30 6b 67 0d 0a | ascii='00kg\r\n'
+[2026-06-15 14:53:16.665] LINHA VÁLIDA #31: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:16.973] BLOCO #27: 2 bytes | hex=53 54 | ascii='ST'
+[2026-06-15 14:53:16.994] BLOCO #28: 16 bytes | hex=2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii=',GS,+0000000kg\r\n'
+[2026-06-15 14:53:16.994] LINHA VÁLIDA #32: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:17.314] BLOCO #29: 10 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 | ascii='ST,GS,+000'
+[2026-06-15 14:53:17.335] BLOCO #30: 8 bytes | hex=30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\n'
+[2026-06-15 14:53:17.336] LINHA VÁLIDA #33: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:17.651] BLOCO #31: 12 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 | ascii='ST,GS,+00000'
+[2026-06-15 14:53:17.672] BLOCO #32: 6 bytes | hex=30 30 6b 67 0d 0a | ascii='00kg\r\n'
+[2026-06-15 14:53:17.673] LINHA VÁLIDA #34: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:17.971] BLOCO #33: 4 bytes | hex=53 54 2c 47 | ascii='ST,G'
+[2026-06-15 14:53:17.993] BLOCO #34: 14 bytes | hex=53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='S,+0000000kg\r\n'
+[2026-06-15 14:53:17.995] LINHA VÁLIDA #35: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:18.320] BLOCO #35: 10 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 | ascii='ST,GS,+000'
+[2026-06-15 14:53:18.332] BLOCO #36: 8 bytes | hex=30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\n'
+[2026-06-15 14:53:18.333] LINHA VÁLIDA #36: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:18.659] BLOCO #37: 15 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b | ascii='ST,GS,+0000000k'
+[2026-06-15 14:53:18.672] BLOCO #38: 3 bytes | hex=67 0d 0a | ascii='g\r\n'
+[2026-06-15 14:53:18.674] LINHA VÁLIDA #37: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:18.979] BLOCO #39: 3 bytes | hex=53 54 2c | ascii='ST,'
+[2026-06-15 14:53:18.992] BLOCO #40: 15 bytes | hex=47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='GS,+0000000kg\r\n'
+[2026-06-15 14:53:18.993] LINHA VÁLIDA #38: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:19.319] BLOCO #41: 7 bytes | hex=53 54 2c 47 53 2c 2b | ascii='ST,GS,+'
+[2026-06-15 14:53:19.331] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:53:19.531] BLOCO #42: 11 bytes | hex=30 30 30 30 30 30 30 6b 67 0d 0a | ascii='0000000kg\r\n'
+[2026-06-15 14:53:19.533] LINHA VÁLIDA #39: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:19.652] BLOCO #43: 9 bytes | hex=53 54 2c 47 53 2c 2b 30 30 | ascii='ST,GS,+00'
+[2026-06-15 14:53:19.664] BLOCO #44: 9 bytes | hex=30 30 30 30 30 6b 67 0d 0a | ascii='00000kg\r\n'
+[2026-06-15 14:53:19.666] LINHA VÁLIDA #40: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:19.990] BLOCO #45: 12 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 | ascii='ST,GS,+00000'
+[2026-06-15 14:53:20.012] BLOCO #46: 6 bytes | hex=30 30 6b 67 0d 0a | ascii='00kg\r\n'
+[2026-06-15 14:53:20.013] LINHA VÁLIDA #41: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:20.317] BLOCO #47: 7 bytes | hex=53 54 2c 47 53 2c 2b | ascii='ST,GS,+'
+[2026-06-15 14:53:20.602] BLOCO #48: 11 bytes | hex=30 30 30 30 30 30 30 6b 67 0d 0a | ascii='0000000kg\r\n'
+[2026-06-15 14:53:20.603] LINHA VÁLIDA #42: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:20.649] BLOCO #49: 13 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 | ascii='ST,GS,+000000'
+[2026-06-15 14:53:20.672] BLOCO #50: 5 bytes | hex=30 6b 67 0d 0a | ascii='0kg\r\n'
+[2026-06-15 14:53:20.674] LINHA VÁLIDA #43: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:20.989] BLOCO #51: 15 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b | ascii='ST,GS,+0000000k'
+[2026-06-15 14:53:21.001] BLOCO #52: 3 bytes | hex=67 0d 0a | ascii='g\r\n'
+[2026-06-15 14:53:21.002] LINHA VÁLIDA #44: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:21.312] BLOCO #53: 3 bytes | hex=53 54 2c | ascii='ST,'
+[2026-06-15 14:53:21.335] BLOCO #54: 15 bytes | hex=47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='GS,+0000000kg\r\n'
+[2026-06-15 14:53:21.336] LINHA VÁLIDA #45: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:21.637] BLOCO #55: 2 bytes | hex=53 54 | ascii='ST'
+[2026-06-15 14:53:21.659] BLOCO #56: 15 bytes | hex=2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d | ascii=',GS,+0000000kg\r'
+[2026-06-15 14:53:21.660] LINHA VÁLIDA #46: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:21.673] BLOCO #57: 1 bytes | hex=0a | ascii='\n'
+[2026-06-15 14:53:21.676] LINHA INVÁLIDA #6: ''
+[2026-06-15 14:53:21.976] BLOCO #58: 6 bytes | hex=53 54 2c 47 53 2c | ascii='ST,GS,'
+[2026-06-15 14:53:21.997] BLOCO #59: 12 bytes | hex=2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='+0000000kg\r\n'
+[2026-06-15 14:53:21.999] LINHA VÁLIDA #47: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:22.318] BLOCO #60: 8 bytes | hex=53 54 2c 47 53 2c 2b 30 | ascii='ST,GS,+0'
+[2026-06-15 14:53:22.330] BLOCO #61: 10 bytes | hex=30 30 30 30 30 30 6b 67 0d 0a | ascii='000000kg\r\n'
+[2026-06-15 14:53:22.332] LINHA VÁLIDA #48: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:22.652] BLOCO #62: 12 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 | ascii='ST,GS,+00000'
+[2026-06-15 14:53:22.664] BLOCO #63: 6 bytes | hex=30 30 6b 67 0d 0a | ascii='00kg\r\n'
+[2026-06-15 14:53:22.666] LINHA VÁLIDA #49: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:22.987] BLOCO #64: 15 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b | ascii='ST,GS,+0000000k'
+[2026-06-15 14:53:23.008] BLOCO #65: 3 bytes | hex=67 0d 0a | ascii='g\r\n'
+[2026-06-15 14:53:23.009] LINHA VÁLIDA #50: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:23.313] BLOCO #66: 5 bytes | hex=53 54 2c 47 53 | ascii='ST,GS'
+[2026-06-15 14:53:23.326] BLOCO #67: 13 bytes | hex=2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii=',+0000000kg\r\n'
+[2026-06-15 14:53:23.328] LINHA VÁLIDA #51: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:23.643] BLOCO #68: 7 bytes | hex=53 54 2c 47 53 2c 2b | ascii='ST,GS,+'
+[2026-06-15 14:53:23.667] BLOCO #69: 11 bytes | hex=30 30 30 30 30 30 30 6b 67 0d 0a | ascii='0000000kg\r\n'
+[2026-06-15 14:53:23.669] LINHA VÁLIDA #52: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:23.983] BLOCO #70: 10 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 | ascii='ST,GS,+000'
+[2026-06-15 14:53:23.995] BLOCO #71: 8 bytes | hex=30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\n'
+[2026-06-15 14:53:23.996] LINHA VÁLIDA #53: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:24.321] BLOCO #72: 13 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 | ascii='ST,GS,+000000'
+[2026-06-15 14:53:24.334] BLOCO #73: 5 bytes | hex=30 6b 67 0d 0a | ascii='0kg\r\n'
+[2026-06-15 14:53:24.336] LINHA VÁLIDA #54: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:24.339] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:53:24.655] BLOCO #74: 15 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b | ascii='ST,GS,+0000000k'
+[2026-06-15 14:53:24.668] BLOCO #75: 3 bytes | hex=67 0d 0a | ascii='g\r\n'
+[2026-06-15 14:53:24.669] LINHA VÁLIDA #55: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:24.975] BLOCO #76: 3 bytes | hex=53 54 2c | ascii='ST,'
+[2026-06-15 14:53:24.986] BLOCO #77: 15 bytes | hex=47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='GS,+0000000kg\r\n'
+[2026-06-15 14:53:24.987] LINHA VÁLIDA #56: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:25.309] BLOCO #78: 5 bytes | hex=53 54 2c 47 53 | ascii='ST,GS'
+[2026-06-15 14:53:25.322] BLOCO #79: 13 bytes | hex=2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii=',+0000000kg\r\n'
+[2026-06-15 14:53:25.324] LINHA VÁLIDA #57: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:25.650] BLOCO #80: 8 bytes | hex=53 54 2c 47 53 2c 2b 30 | ascii='ST,GS,+0'
+[2026-06-15 14:53:25.672] BLOCO #81: 10 bytes | hex=30 30 30 30 30 30 6b 67 0d 0a | ascii='000000kg\r\n'
+[2026-06-15 14:53:25.674] LINHA VÁLIDA #58: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:25.985] BLOCO #82: 9 bytes | hex=53 54 2c 47 53 2c 2b 30 30 | ascii='ST,GS,+00'
+[2026-06-15 14:53:25.997] BLOCO #83: 9 bytes | hex=30 30 30 30 30 6b 67 0d 0a | ascii='00000kg\r\n'
+[2026-06-15 14:53:25.998] LINHA VÁLIDA #59: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:26.311] BLOCO #84: 4 bytes | hex=53 54 2c 47 | ascii='ST,G'
+[2026-06-15 14:53:26.323] BLOCO #85: 14 bytes | hex=53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='S,+0000000kg\r\n'
+[2026-06-15 14:53:26.324] LINHA VÁLIDA #60: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:26.648] BLOCO #86: 8 bytes | hex=53 54 2c 47 53 2c 2b 30 | ascii='ST,GS,+0'
+[2026-06-15 14:53:26.703] BLOCO #87: 10 bytes | hex=30 30 30 30 30 30 6b 67 0d 0a | ascii='000000kg\r\n'
+[2026-06-15 14:53:26.704] LINHA VÁLIDA #61: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:26.991] BLOCO #88: 15 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b | ascii='ST,GS,+0000000k'
+[2026-06-15 14:53:27.003] BLOCO #89: 3 bytes | hex=67 0d 0a | ascii='g\r\n'
+[2026-06-15 14:53:27.003] LINHA VÁLIDA #62: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:27.317] BLOCO #90: 5 bytes | hex=53 54 2c 47 53 | ascii='ST,GS'
+[2026-06-15 14:53:27.329] BLOCO #91: 13 bytes | hex=2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii=',+0000000kg\r\n'
+[2026-06-15 14:53:27.332] LINHA VÁLIDA #63: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:27.649] BLOCO #92: 12 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 | ascii='ST,GS,+00000'
+[2026-06-15 14:53:27.672] BLOCO #93: 6 bytes | hex=30 30 6b 67 0d 0a | ascii='00kg\r\n'
+[2026-06-15 14:53:27.673] LINHA VÁLIDA #64: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:27.978] BLOCO #94: 3 bytes | hex=53 54 2c | ascii='ST,'
+[2026-06-15 14:53:28.000] BLOCO #95: 15 bytes | hex=47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='GS,+0000000kg\r\n'
+[2026-06-15 14:53:28.001] LINHA VÁLIDA #65: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:28.326] BLOCO #96: 11 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 | ascii='ST,GS,+0000'
+[2026-06-15 14:53:28.338] BLOCO #97: 7 bytes | hex=30 30 30 6b 67 0d 0a | ascii='000kg\r\n'
+[2026-06-15 14:53:28.340] LINHA VÁLIDA #66: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:28.638] BLOCO #98: 4 bytes | hex=53 54 2c 47 | ascii='ST,G'
+[2026-06-15 14:53:28.661] BLOCO #99: 14 bytes | hex=53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='S,+0000000kg\r\n'
+[2026-06-15 14:53:28.663] LINHA VÁLIDA #67: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:28.973] BLOCO #100: 7 bytes | hex=53 54 2c 47 53 2c 2b | ascii='ST,GS,+'
+[2026-06-15 14:53:29.331] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:53:29.516] BLOCO #101: 11 bytes | hex=30 30 30 30 30 30 30 6b 67 0d 0a | ascii='0000000kg\r\n'
+[2026-06-15 14:53:29.516] LINHA VÁLIDA #68: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:29.538] BLOCO #102: 18 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='ST,GS,+0000000kg\r\n'
+[2026-06-15 14:53:29.539] LINHA VÁLIDA #69: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:29.643] BLOCO #103: 8 bytes | hex=53 54 2c 47 53 2c 2b 30 | ascii='ST,GS,+0'
+[2026-06-15 14:53:29.720] BLOCO #104: 10 bytes | hex=30 30 30 30 30 30 6b 67 0d 0a | ascii='000000kg\r\n'
+[2026-06-15 14:53:29.722] LINHA VÁLIDA #70: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:29.973] BLOCO #105: 6 bytes | hex=53 54 2c 47 53 2c | ascii='ST,GS,'
+[2026-06-15 14:53:29.995] BLOCO #106: 12 bytes | hex=2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='+0000000kg\r\n'
+[2026-06-15 14:53:29.996] LINHA VÁLIDA #71: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:30.319] BLOCO #107: 10 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 | ascii='ST,GS,+000'
+[2026-06-15 14:53:30.330] BLOCO #108: 8 bytes | hex=30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\n'
+[2026-06-15 14:53:30.330] LINHA VÁLIDA #72: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:30.649] BLOCO #109: 14 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 | ascii='ST,GS,+0000000'
+[2026-06-15 14:53:30.672] BLOCO #110: 4 bytes | hex=6b 67 0d 0a | ascii='kg\r\n'
+[2026-06-15 14:53:30.674] LINHA VÁLIDA #73: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:30.978] BLOCO #111: 1 bytes | hex=53 | ascii='S'
+[2026-06-15 14:53:30.990] BLOCO #112: 15 bytes | hex=54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 | ascii='T,GS,+0000000kg'
+[2026-06-15 14:53:31.001] BLOCO #113: 2 bytes | hex=0d 0a | ascii='\r\n'
+[2026-06-15 14:53:31.002] LINHA VÁLIDA #74: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:31.305] BLOCO #114: 4 bytes | hex=53 54 2c 47 | ascii='ST,G'
+[2026-06-15 14:53:31.326] BLOCO #115: 14 bytes | hex=53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='S,+0000000kg\r\n'
+[2026-06-15 14:53:31.327] LINHA VÁLIDA #75: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:31.641] BLOCO #116: 6 bytes | hex=53 54 2c 47 53 2c | ascii='ST,GS,'
+[2026-06-15 14:53:31.664] BLOCO #117: 12 bytes | hex=2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='+0000000kg\r\n'
+[2026-06-15 14:53:31.665] LINHA VÁLIDA #76: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:31.980] BLOCO #118: 10 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 | ascii='ST,GS,+000'
+[2026-06-15 14:53:31.991] BLOCO #119: 8 bytes | hex=30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\n'
+[2026-06-15 14:53:31.992] LINHA VÁLIDA #77: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:32.322] BLOCO #120: 12 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 | ascii='ST,GS,+00000'
+[2026-06-15 14:53:32.333] BLOCO #121: 6 bytes | hex=30 30 6b 67 0d 0a | ascii='00kg\r\n'
+[2026-06-15 14:53:32.333] LINHA VÁLIDA #78: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:32.636] BLOCO #122: 3 bytes | hex=53 54 2c | ascii='ST,'
+[2026-06-15 14:53:32.658] BLOCO #123: 15 bytes | hex=47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='GS,+0000000kg\r\n'
+[2026-06-15 14:53:32.658] LINHA VÁLIDA #79: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:32.978] BLOCO #124: 7 bytes | hex=53 54 2c 47 53 2c 2b | ascii='ST,GS,+'
+[2026-06-15 14:53:32.994] BLOCO #125: 11 bytes | hex=30 30 30 30 30 30 30 6b 67 0d 0a | ascii='0000000kg\r\n'
+[2026-06-15 14:53:32.996] LINHA VÁLIDA #80: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:33.318] BLOCO #126: 10 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 | ascii='ST,GS,+000'
+[2026-06-15 14:53:33.331] BLOCO #127: 8 bytes | hex=30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\n'
+[2026-06-15 14:53:33.332] LINHA VÁLIDA #81: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:33.646] BLOCO #128: 13 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 | ascii='ST,GS,+000000'
+[2026-06-15 14:53:33.667] BLOCO #129: 5 bytes | hex=30 6b 67 0d 0a | ascii='0kg\r\n'
+[2026-06-15 14:53:33.668] LINHA VÁLIDA #82: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:34.001] BLOCO #130: 15 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b | ascii='ST,GS,+0000000k'
+[2026-06-15 14:53:34.023] BLOCO #131: 3 bytes | hex=67 0d 0a | ascii='g\r\n'
+[2026-06-15 14:53:34.024] LINHA VÁLIDA #83: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:34.306] BLOCO #132: 4 bytes | hex=53 54 2c 47 | ascii='ST,G'
+[2026-06-15 14:53:34.328] BLOCO #133: 14 bytes | hex=53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='S,+0000000kg\r\n'
+[2026-06-15 14:53:34.330] LINHA VÁLIDA #84: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:34.332] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:53:34.648] BLOCO #134: 13 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 | ascii='ST,GS,+000000'
+[2026-06-15 14:53:34.671] BLOCO #135: 5 bytes | hex=30 6b 67 0d 0a | ascii='0kg\r\n'
+[2026-06-15 14:53:34.673] LINHA VÁLIDA #85: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:34.977] BLOCO #136: 1 bytes | hex=53 | ascii='S'
+[2026-06-15 14:53:34.991] BLOCO #137: 15 bytes | hex=54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 | ascii='T,GS,+0000000kg'
+[2026-06-15 14:53:35.003] BLOCO #138: 2 bytes | hex=0d 0a | ascii='\r\n'
+[2026-06-15 14:53:35.004] LINHA VÁLIDA #86: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:35.336] BLOCO #139: 6 bytes | hex=53 54 2c 47 53 2c | ascii='ST,GS,'
+[2026-06-15 14:53:37.912] BLOCO #140: 12 bytes | hex=2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='+0000000kg\r\n'
+[2026-06-15 14:53:37.915] LINHA VÁLIDA #87: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:39.330] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:53:44.336] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:53:46.631] BLOCO #141: 532 bytes | hex=30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\n'
+[2026-06-15 14:53:46.635] LINHA INVÁLIDA #7: '000000kg'
+[2026-06-15 14:53:46.641] LINHA VÁLIDA #88: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.643] LINHA VÁLIDA #89: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.645] LINHA VÁLIDA #90: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.648] LINHA VÁLIDA #91: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.650] LINHA VÁLIDA #92: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.653] LINHA VÁLIDA #93: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.657] LINHA VÁLIDA #94: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.660] LINHA VÁLIDA #95: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.662] LINHA VÁLIDA #96: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.666] LINHA VÁLIDA #97: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.668] LINHA VÁLIDA #98: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.669] LINHA VÁLIDA #99: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.671] LINHA VÁLIDA #100: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.673] LINHA VÁLIDA #101: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.674] LINHA VÁLIDA #102: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.676] LINHA VÁLIDA #103: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.677] LINHA VÁLIDA #104: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.679] LINHA VÁLIDA #105: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.680] LINHA VÁLIDA #106: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.681] LINHA VÁLIDA #107: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.683] LINHA VÁLIDA #108: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.684] LINHA VÁLIDA #109: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.685] LINHA VÁLIDA #110: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.686] LINHA VÁLIDA #111: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.687] LINHA VÁLIDA #112: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.689] LINHA VÁLIDA #113: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.690] LINHA VÁLIDA #114: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.692] LINHA VÁLIDA #115: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.693] LINHA VÁLIDA #116: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.705] BLOCO #142: 18 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='ST,GS,+0000000kg\r\n'
+[2026-06-15 14:53:46.706] LINHA VÁLIDA #117: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:46.989] BLOCO #143: 12 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 | ascii='ST,GS,+00000'
+[2026-06-15 14:53:47.001] BLOCO #144: 6 bytes | hex=30 30 6b 67 0d 0a | ascii='00kg\r\n'
+[2026-06-15 14:53:47.002] LINHA VÁLIDA #118: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:47.323] BLOCO #145: 16 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 | ascii='ST,GS,+0000000kg'
+[2026-06-15 14:53:47.346] BLOCO #146: 2 bytes | hex=0d 0a | ascii='\r\n'
+[2026-06-15 14:53:47.347] LINHA VÁLIDA #119: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:47.643] BLOCO #147: 9 bytes | hex=53 54 2c 47 53 2c 2b 30 30 | ascii='ST,GS,+00'
+[2026-06-15 14:53:47.666] BLOCO #148: 9 bytes | hex=30 30 30 30 30 6b 67 0d 0a | ascii='00000kg\r\n'
+[2026-06-15 14:53:47.667] LINHA VÁLIDA #120: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:47.984] BLOCO #149: 11 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 | ascii='ST,GS,+0000'
+[2026-06-15 14:53:47.996] BLOCO #150: 7 bytes | hex=30 30 30 6b 67 0d 0a | ascii='000kg\r\n'
+[2026-06-15 14:53:47.998] LINHA VÁLIDA #121: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:48.313] BLOCO #151: 14 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 | ascii='ST,GS,+0000000'
+[2026-06-15 14:53:48.336] BLOCO #152: 4 bytes | hex=6b 67 0d 0a | ascii='kg\r\n'
+[2026-06-15 14:53:48.338] LINHA VÁLIDA #122: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:48.633] BLOCO #153: 1 bytes | hex=53 | ascii='S'
+[2026-06-15 14:53:48.658] BLOCO #154: 15 bytes | hex=54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 | ascii='T,GS,+0000000kg'
+[2026-06-15 14:53:48.671] BLOCO #155: 2 bytes | hex=0d 0a | ascii='\r\n'
+[2026-06-15 14:53:48.672] LINHA VÁLIDA #123: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:48.969] BLOCO #156: 4 bytes | hex=53 54 2c 47 | ascii='ST,G'
+[2026-06-15 14:53:48.993] BLOCO #157: 14 bytes | hex=53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='S,+0000000kg\r\n'
+[2026-06-15 14:53:48.995] LINHA VÁLIDA #124: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:49.309] BLOCO #158: 7 bytes | hex=53 54 2c 47 53 2c 2b | ascii='ST,GS,+'
+[2026-06-15 14:53:49.322] BLOCO #159: 11 bytes | hex=30 30 30 30 30 30 30 6b 67 0d 0a | ascii='0000000kg\r\n'
+[2026-06-15 14:53:49.323] LINHA VÁLIDA #125: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:49.326] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:53:49.642] BLOCO #160: 10 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 | ascii='ST,GS,+000'
+[2026-06-15 14:53:49.665] BLOCO #161: 8 bytes | hex=30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\n'
+[2026-06-15 14:53:49.666] LINHA VÁLIDA #126: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:49.982] BLOCO #162: 12 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 | ascii='ST,GS,+00000'
+[2026-06-15 14:53:50.004] BLOCO #163: 6 bytes | hex=30 30 6b 67 0d 0a | ascii='00kg\r\n'
+[2026-06-15 14:53:50.006] LINHA VÁLIDA #127: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:50.311] BLOCO #164: 3 bytes | hex=53 54 2c | ascii='ST,'
+[2026-06-15 14:53:50.334] BLOCO #165: 15 bytes | hex=47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='GS,+0000000kg\r\n'
+[2026-06-15 14:53:50.335] LINHA VÁLIDA #128: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:50.642] BLOCO #166: 3 bytes | hex=53 54 2c | ascii='ST,'
+[2026-06-15 14:53:50.655] BLOCO #167: 15 bytes | hex=47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='GS,+0000000kg\r\n'
+[2026-06-15 14:53:50.657] LINHA VÁLIDA #129: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:50.993] BLOCO #168: 9 bytes | hex=53 54 2c 47 53 2c 2b 30 30 | ascii='ST,GS,+00'
+[2026-06-15 14:53:51.006] BLOCO #169: 9 bytes | hex=30 30 30 30 30 6b 67 0d 0a | ascii='00000kg\r\n'
+[2026-06-15 14:53:51.007] LINHA VÁLIDA #130: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:51.313] BLOCO #170: 5 bytes | hex=53 54 2c 47 53 | ascii='ST,GS'
+[2026-06-15 14:53:51.325] BLOCO #171: 13 bytes | hex=2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii=',+0000000kg\r\n'
+[2026-06-15 14:53:51.327] LINHA VÁLIDA #131: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:51.653] BLOCO #172: 10 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 | ascii='ST,GS,+000'
+[2026-06-15 14:53:51.665] BLOCO #173: 8 bytes | hex=30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\n'
+[2026-06-15 14:53:51.667] LINHA VÁLIDA #132: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:51.971] BLOCO #174: 1 bytes | hex=53 | ascii='S'
+[2026-06-15 14:53:51.994] BLOCO #175: 15 bytes | hex=54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 | ascii='T,GS,+0000000kg'
+[2026-06-15 14:53:52.007] BLOCO #176: 2 bytes | hex=0d 0a | ascii='\r\n'
+[2026-06-15 14:53:52.010] LINHA VÁLIDA #133: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:52.317] BLOCO #177: 11 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 | ascii='ST,GS,+0000'
+[2026-06-15 14:53:52.329] BLOCO #178: 7 bytes | hex=30 30 30 6b 67 0d 0a | ascii='000kg\r\n'
+[2026-06-15 14:53:52.329] LINHA VÁLIDA #134: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:52.652] BLOCO #179: 14 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 | ascii='ST,GS,+0000000'
+[2026-06-15 14:53:52.664] BLOCO #180: 4 bytes | hex=6b 67 0d 0a | ascii='kg\r\n'
+[2026-06-15 14:53:52.665] LINHA VÁLIDA #135: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:52.967] BLOCO #181: 1 bytes | hex=53 | ascii='S'
+[2026-06-15 14:53:52.999] BLOCO #182: 15 bytes | hex=54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 | ascii='T,GS,+0000000kg'
+[2026-06-15 14:53:53.011] BLOCO #183: 2 bytes | hex=0d 0a | ascii='\r\n'
+[2026-06-15 14:53:53.013] LINHA VÁLIDA #136: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:53.314] BLOCO #184: 10 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 | ascii='ST,GS,+000'
+[2026-06-15 14:53:53.326] BLOCO #185: 8 bytes | hex=30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\n'
+[2026-06-15 14:53:53.328] LINHA VÁLIDA #137: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:53.650] BLOCO #186: 13 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 | ascii='ST,GS,+000000'
+[2026-06-15 14:53:53.662] BLOCO #187: 5 bytes | hex=30 6b 67 0d 0a | ascii='0kg\r\n'
+[2026-06-15 14:53:53.664] LINHA VÁLIDA #138: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:53.984] BLOCO #188: 15 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b | ascii='ST,GS,+0000000k'
+[2026-06-15 14:53:54.006] BLOCO #189: 3 bytes | hex=67 0d 0a | ascii='g\r\n'
+[2026-06-15 14:53:54.008] LINHA VÁLIDA #139: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:54.302] BLOCO #190: 3 bytes | hex=53 54 2c | ascii='ST,'
+[2026-06-15 14:53:54.324] BLOCO #191: 15 bytes | hex=47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='GS,+0000000kg\r\n'
+[2026-06-15 14:53:54.325] LINHA VÁLIDA #140: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:54.326] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:53:54.648] BLOCO #192: 7 bytes | hex=53 54 2c 47 53 2c 2b | ascii='ST,GS,+'
+[2026-06-15 14:53:54.659] BLOCO #193: 11 bytes | hex=30 30 30 30 30 30 30 6b 67 0d 0a | ascii='0000000kg\r\n'
+[2026-06-15 14:53:54.660] LINHA VÁLIDA #141: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:54.983] BLOCO #194: 10 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 | ascii='ST,GS,+000'
+[2026-06-15 14:53:54.994] BLOCO #195: 8 bytes | hex=30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\n'
+[2026-06-15 14:53:54.995] LINHA VÁLIDA #142: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:55.320] BLOCO #196: 12 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 | ascii='ST,GS,+00000'
+[2026-06-15 14:53:55.332] BLOCO #197: 6 bytes | hex=30 30 6b 67 0d 0a | ascii='00kg\r\n'
+[2026-06-15 14:53:55.333] LINHA VÁLIDA #143: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:55.655] BLOCO #198: 16 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 | ascii='ST,GS,+0000000kg'
+[2026-06-15 14:53:55.666] BLOCO #199: 2 bytes | hex=0d 0a | ascii='\r\n'
+[2026-06-15 14:53:55.667] LINHA VÁLIDA #144: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:55.969] BLOCO #200: 4 bytes | hex=53 54 2c 47 | ascii='ST,G'
+[2026-06-15 14:53:55.992] BLOCO #201: 14 bytes | hex=53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='S,+0000000kg\r\n'
+[2026-06-15 14:53:55.993] LINHA VÁLIDA #145: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:56.314] BLOCO #202: 7 bytes | hex=53 54 2c 47 53 2c 2b | ascii='ST,GS,+'
+[2026-06-15 14:53:56.326] BLOCO #203: 11 bytes | hex=30 30 30 30 30 30 30 6b 67 0d 0a | ascii='0000000kg\r\n'
+[2026-06-15 14:53:56.327] LINHA VÁLIDA #146: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:56.652] BLOCO #204: 10 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 | ascii='ST,GS,+000'
+[2026-06-15 14:53:56.664] BLOCO #205: 8 bytes | hex=30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\n'
+[2026-06-15 14:53:56.666] LINHA VÁLIDA #147: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:56.981] BLOCO #206: 13 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 | ascii='ST,GS,+000000'
+[2026-06-15 14:53:56.993] BLOCO #207: 5 bytes | hex=30 6b 67 0d 0a | ascii='0kg\r\n'
+[2026-06-15 14:53:56.995] LINHA VÁLIDA #148: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:57.325] BLOCO #208: 15 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b | ascii='ST,GS,+0000000k'
+[2026-06-15 14:53:57.337] BLOCO #209: 3 bytes | hex=67 0d 0a | ascii='g\r\n'
+[2026-06-15 14:53:57.339] LINHA VÁLIDA #149: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:57.638] BLOCO #210: 5 bytes | hex=53 54 2c 47 53 | ascii='ST,GS'
+[2026-06-15 14:53:57.660] BLOCO #211: 13 bytes | hex=2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii=',+0000000kg\r\n'
+[2026-06-15 14:53:57.662] LINHA VÁLIDA #150: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:57.977] BLOCO #212: 8 bytes | hex=53 54 2c 47 53 2c 2b 30 | ascii='ST,GS,+0'
+[2026-06-15 14:53:57.990] BLOCO #213: 10 bytes | hex=30 30 30 30 30 30 6b 67 0d 0a | ascii='000000kg\r\n'
+[2026-06-15 14:53:57.991] LINHA VÁLIDA #151: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:58.318] BLOCO #214: 10 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 | ascii='ST,GS,+000'
+[2026-06-15 14:53:58.329] BLOCO #215: 8 bytes | hex=30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\n'
+[2026-06-15 14:53:58.330] LINHA VÁLIDA #152: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:58.653] BLOCO #216: 14 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 | ascii='ST,GS,+0000000'
+[2026-06-15 14:53:58.665] BLOCO #217: 4 bytes | hex=6b 67 0d 0a | ascii='kg\r\n'
+[2026-06-15 14:53:58.666] LINHA VÁLIDA #153: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:58.973] BLOCO #218: 1 bytes | hex=53 | ascii='S'
+[2026-06-15 14:53:58.986] BLOCO #219: 15 bytes | hex=54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 | ascii='T,GS,+0000000kg'
+[2026-06-15 14:53:58.999] BLOCO #220: 2 bytes | hex=0d 0a | ascii='\r\n'
+[2026-06-15 14:53:59.000] LINHA VÁLIDA #154: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:59.306] BLOCO #221: 4 bytes | hex=53 54 2c 47 | ascii='ST,G'
+[2026-06-15 14:53:59.319] BLOCO #222: 14 bytes | hex=53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='S,+0000000kg\r\n'
+[2026-06-15 14:53:59.320] LINHA VÁLIDA #155: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:59.332] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:53:59.645] BLOCO #223: 6 bytes | hex=53 54 2c 47 53 2c | ascii='ST,GS,'
+[2026-06-15 14:53:59.658] BLOCO #224: 12 bytes | hex=2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='+0000000kg\r\n'
+[2026-06-15 14:53:59.659] LINHA VÁLIDA #156: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:53:59.984] BLOCO #225: 9 bytes | hex=53 54 2c 47 53 2c 2b 30 30 | ascii='ST,GS,+00'
+[2026-06-15 14:53:59.997] BLOCO #226: 9 bytes | hex=30 30 30 30 30 6b 67 0d 0a | ascii='00000kg\r\n'
+[2026-06-15 14:53:59.999] LINHA VÁLIDA #157: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:00.324] BLOCO #227: 15 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b | ascii='ST,GS,+0000000k'
+[2026-06-15 14:54:00.336] BLOCO #228: 3 bytes | hex=67 0d 0a | ascii='g\r\n'
+[2026-06-15 14:54:00.336] LINHA VÁLIDA #158: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:00.640] BLOCO #229: 4 bytes | hex=53 54 2c 47 | ascii='ST,G'
+[2026-06-15 14:54:00.653] BLOCO #230: 14 bytes | hex=53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='S,+0000000kg\r\n'
+[2026-06-15 14:54:00.655] LINHA VÁLIDA #159: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:00.973] BLOCO #231: 7 bytes | hex=53 54 2c 47 53 2c 2b | ascii='ST,GS,+'
+[2026-06-15 14:54:00.997] BLOCO #232: 11 bytes | hex=30 30 30 30 30 30 30 6b 67 0d 0a | ascii='0000000kg\r\n'
+[2026-06-15 14:54:01.000] LINHA VÁLIDA #160: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:01.310] BLOCO #233: 10 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 | ascii='ST,GS,+000'
+[2026-06-15 14:54:01.331] BLOCO #234: 8 bytes | hex=30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\n'
+[2026-06-15 14:54:01.332] LINHA VÁLIDA #161: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:01.649] BLOCO #235: 12 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 | ascii='ST,GS,+00000'
+[2026-06-15 14:54:01.670] BLOCO #236: 6 bytes | hex=30 30 6b 67 0d 0a | ascii='00kg\r\n'
+[2026-06-15 14:54:01.671] LINHA VÁLIDA #162: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:01.968] BLOCO #237: 1 bytes | hex=53 | ascii='S'
+[2026-06-15 14:54:01.990] BLOCO #238: 15 bytes | hex=54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 | ascii='T,GS,+0000000kg'
+[2026-06-15 14:54:02.000] BLOCO #239: 2 bytes | hex=0d 0a | ascii='\r\n'
+[2026-06-15 14:54:02.001] LINHA VÁLIDA #163: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:02.308] BLOCO #240: 4 bytes | hex=53 54 2c 47 | ascii='ST,G'
+[2026-06-15 14:54:02.319] BLOCO #241: 14 bytes | hex=53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='S,+0000000kg\r\n'
+[2026-06-15 14:54:02.321] LINHA VÁLIDA #164: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:02.669] BLOCO #242: 6 bytes | hex=53 54 2c 47 53 2c | ascii='ST,GS,'
+[2026-06-15 14:54:04.333] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:54:06.516] BLOCO #243: 12 bytes | hex=2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='+0000000kg\r\n'
+[2026-06-15 14:54:06.521] LINHA VÁLIDA #165: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:09.326] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:54:14.334] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:54:19.331] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:54:24.336] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:54:29.326] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:54:31.424] BLOCO #244: 494 bytes | hex=30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0a 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\n\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\n'
+[2026-06-15 14:54:31.425] LINHA INVÁLIDA #8: '0000kg'
+[2026-06-15 14:54:31.427] LINHA VÁLIDA #166: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.428] LINHA VÁLIDA #167: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.429] LINHA VÁLIDA #168: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.430] LINHA VÁLIDA #169: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.431] LINHA VÁLIDA #170: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.431] LINHA VÁLIDA #171: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.432] LINHA VÁLIDA #172: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.434] LINHA VÁLIDA #173: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.435] LINHA VÁLIDA #174: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.435] LINHA VÁLIDA #175: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.436] LINHA VÁLIDA #176: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.437] LINHA INVÁLIDA #9: ''
+[2026-06-15 14:54:31.438] LINHA VÁLIDA #177: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.438] LINHA VÁLIDA #178: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.439] LINHA VÁLIDA #179: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.440] LINHA VÁLIDA #180: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.442] LINHA VÁLIDA #181: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.443] LINHA VÁLIDA #182: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.443] LINHA VÁLIDA #183: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.444] LINHA VÁLIDA #184: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.445] LINHA VÁLIDA #185: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.445] LINHA VÁLIDA #186: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.446] LINHA VÁLIDA #187: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.447] LINHA VÁLIDA #188: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.448] LINHA VÁLIDA #189: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.448] LINHA VÁLIDA #190: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.449] LINHA VÁLIDA #191: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.450] LINHA VÁLIDA #192: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.645] BLOCO #245: 11 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 | ascii='ST,GS,+0000'
+[2026-06-15 14:54:31.667] BLOCO #246: 7 bytes | hex=30 30 30 6b 67 0d 0a | ascii='000kg\r\n'
+[2026-06-15 14:54:31.667] LINHA VÁLIDA #193: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:31.984] BLOCO #247: 14 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 | ascii='ST,GS,+0000000'
+[2026-06-15 14:54:31.995] BLOCO #248: 4 bytes | hex=6b 67 0d 0a | ascii='kg\r\n'
+[2026-06-15 14:54:31.995] LINHA VÁLIDA #194: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:32.302] BLOCO #249: 1 bytes | hex=53 | ascii='S'
+[2026-06-15 14:54:32.313] BLOCO #250: 16 bytes | hex=54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d | ascii='T,GS,+0000000kg\r'
+[2026-06-15 14:54:32.314] LINHA VÁLIDA #195: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:32.336] BLOCO #251: 1 bytes | hex=0a | ascii='\n'
+[2026-06-15 14:54:32.337] LINHA INVÁLIDA #10: ''
+[2026-06-15 14:54:32.636] BLOCO #252: 4 bytes | hex=53 54 2c 47 | ascii='ST,G'
+[2026-06-15 14:54:32.659] BLOCO #253: 14 bytes | hex=53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='S,+0000000kg\r\n'
+[2026-06-15 14:54:32.661] LINHA VÁLIDA #196: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:32.980] BLOCO #254: 7 bytes | hex=53 54 2c 47 53 2c 2b | ascii='ST,GS,+'
+[2026-06-15 14:54:32.991] BLOCO #255: 11 bytes | hex=30 30 30 30 30 30 30 6b 67 0d 0a | ascii='0000000kg\r\n'
+[2026-06-15 14:54:32.992] LINHA VÁLIDA #197: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:33.315] BLOCO #256: 11 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 | ascii='ST,GS,+0000'
+[2026-06-15 14:54:33.327] BLOCO #257: 7 bytes | hex=30 30 30 6b 67 0d 0a | ascii='000kg\r\n'
+[2026-06-15 14:54:33.328] LINHA VÁLIDA #198: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:33.646] BLOCO #258: 13 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 | ascii='ST,GS,+000000'
+[2026-06-15 14:54:33.669] BLOCO #259: 5 bytes | hex=30 6b 67 0d 0a | ascii='0kg\r\n'
+[2026-06-15 14:54:33.671] LINHA VÁLIDA #199: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:33.971] BLOCO #260: 2 bytes | hex=53 54 | ascii='ST'
+[2026-06-15 14:54:33.983] BLOCO #261: 15 bytes | hex=2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d | ascii=',GS,+0000000kg\r'
+[2026-06-15 14:54:33.984] LINHA VÁLIDA #200: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 14:54:33.997] BLOCO #262: 1 bytes | hex=0a | ascii='\n'
+[2026-06-15 14:54:34.000] LINHA INVÁLIDA #11: ''
+[2026-06-15 14:54:34.305] BLOCO #263: 4 bytes | hex=53 54 2c 47 | ascii='ST,G'
+[2026-06-15 14:54:34.316] SOBRA NO BUFFER SEM QUEBRA DE LINHA: b'ST,G'
+[2026-06-15 14:54:34.318] Status final: {"is_open": true, "name": "COM3", "in_waiting": 14, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 14:54:34.442] RESUMO DA PORTA: {
+  "bytes": 3657,
+  "blocks": 263,
+  "lines": 211,
+  "valid_weight_lines": 200,
+  "invalid_lines": 11,
+  "serial_errors": 0,
+  "max_gap_seconds": 35.79719049999994,
+  "first_byte_at": "2026-06-15 14:52:34.337",
+  "last_byte_at": "2026-06-15 14:54:34.305"
+}
+
+[2026-06-15 14:54:34.462] ================================================================================
+[2026-06-15 14:54:34.464] FIM DO DEBUG2
+[2026-06-15 14:54:34.466] ================================================================================
+[2026-06-15 14:54:34.470] Log gerado: D:\OneDrive\Documentos\Códigos\debug2_DESKTOP-FJ69N4K_20260615_145229.log
+[2026-06-15 14:54:34.473] Resumo CSV gerado: D:\OneDrive\Documentos\Códigos\debug2_DESKTOP-FJ69N4K_20260615_145229.csv

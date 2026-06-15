@@ -1,0 +1,2 @@
+port;baudrate;duration_seconds;bytes;blocks;lines;valid_weight_lines;invalid_lines;serial_errors;max_gap_seconds;first_byte_at;last_byte_at
+COM3;9600;120;3657;263;211;200;11;0;35.79719049999994;2026-06-15 14:52:34.337;2026-06-15 14:54:34.305
