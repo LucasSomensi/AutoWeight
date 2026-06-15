@@ -1,0 +1,321 @@
+
+[2026-06-15 15:18:38.024] ================================================================================
+[2026-06-15 15:18:38.025] INÍCIO DO DEBUG2 DA BALANÇA
+[2026-06-15 15:18:38.026] ================================================================================
+[2026-06-15 15:18:38.026] Arquivo de log: C:\Users\Pichau\Documents\debug2_PICHAUP-TVJ89LI_20260615_151838.log
+[2026-06-15 15:18:38.027] Arquivo CSV resumo: C:\Users\Pichau\Documents\debug2_PICHAUP-TVJ89LI_20260615_151838.csv
+[2026-06-15 15:18:38.027] Rode este script nos dois computadores com a mesma balança/cabo/adaptador, se possível.
+[2026-06-15 15:18:38.028] Depois envie o .log e o .csv de cada computador para comparação.
+
+[2026-06-15 15:18:38.028] ================================================================================
+[2026-06-15 15:18:38.029] INFORMAÇÕES DO SISTEMA
+[2026-06-15 15:18:38.029] ================================================================================
+[2026-06-15 15:18:38.119] {
+  "hostname": "PICHAUP-TVJ89LI",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "system": "Windows",
+  "release": "10",
+  "version": "10.0.19045",
+  "machine": "AMD64",
+  "processor": "Intel64 Family 6 Model 158 Stepping 11, GenuineIntel",
+  "python_executable": "C:\\Program Files\\Python314\\python.exe",
+  "python_version": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "cwd": "C:\\Users\\Pichau\\Documents",
+  "pyserial_version": "3.5"
+}
+
+[2026-06-15 15:18:38.121] ================================================================================
+[2026-06-15 15:18:38.122] VARIÁVEIS DE AMBIENTE RELEVANTES
+[2026-06-15 15:18:38.122] ================================================================================
+[2026-06-15 15:18:38.122] PATH=C:\Program Files\Python314\Scripts\;C:\Program Files\Python314\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Users\Pichau\AppData\Local\Microsoft\WindowsApps;
+
+[2026-06-15 15:18:38.123] ================================================================================
+[2026-06-15 15:18:38.123] PORTAS SERIAIS DETECTADAS PELO PYSERIAL
+[2026-06-15 15:18:38.124] ================================================================================
+[2026-06-15 15:18:38.130] PORTA #1
+[2026-06-15 15:18:38.131] {
+  "device": "COM1",
+  "name": "COM1",
+  "description": "Porta de comunicação (COM1)",
+  "hwid": "ACPI\\PNP0501\\0",
+  "vid": null,
+  "pid": null,
+  "serial_number": null,
+  "location": null,
+  "manufacturer": "(Tipos de porta padrão)",
+  "product": null,
+  "interface": null
+}
+[2026-06-15 15:18:38.131] PORTA #2
+[2026-06-15 15:18:38.132] {
+  "device": "COM3",
+  "name": "COM3",
+  "description": "USB Serial Port (COM3)",
+  "hwid": "USB VID:PID=0403:6001 SER=A9O5HZZNA",
+  "vid": "0x0403",
+  "pid": "0x6001",
+  "serial_number": "A9O5HZZNA",
+  "location": null,
+  "manufacturer": "FTDI",
+  "product": null,
+  "interface": null
+}
+
+[2026-06-15 15:18:38.133] ================================================================================
+[2026-06-15 15:18:38.133] COMANDOS DO SISTEMA / USB / SERIAL
+[2026-06-15 15:18:38.135] ================================================================================
+[2026-06-15 15:18:38.136] $ where python
+[2026-06-15 15:18:38.202] exit_code=0
+[2026-06-15 15:18:38.202]   C:\Program Files\Python314\python.exe
+[2026-06-15 15:18:38.203]   C:\Users\Pichau\AppData\Local\Microsoft\WindowsApps\python.exe
+[2026-06-15 15:18:38.204] $ python -m pip show pyserial
+[2026-06-15 15:18:38.531] exit_code=0
+[2026-06-15 15:18:38.531]   Name: pyserial
+[2026-06-15 15:18:38.532]   Version: 3.5
+[2026-06-15 15:18:38.532]   Summary: Python Serial Port Extension
+[2026-06-15 15:18:38.533]   Home-page: https://github.com/pyserial/pyserial
+[2026-06-15 15:18:38.533]   Author: Chris Liechti
+[2026-06-15 15:18:38.533]   Author-email: cliechti@gmx.net
+[2026-06-15 15:18:38.534]   License: BSD
+[2026-06-15 15:18:38.534]   Location: C:\Users\Pichau\AppData\Roaming\Python\Python314\site-packages
+[2026-06-15 15:18:38.534]   Requires: 
+[2026-06-15 15:18:38.535]   Required-by:
+[2026-06-15 15:18:38.535] $ mode
+[2026-06-15 15:18:38.536] exit_code=None
+[2026-06-15 15:18:38.536]   FileNotFoundError: FileNotFoundError(2, 'O sistema não pode encontrar o arquivo especificado', None, 2, None)
+[2026-06-15 15:18:38.536] $ powershell -NoProfile -Command Get-CimInstance Win32_SerialPort | Format-List *
+[2026-06-15 15:18:38.852] exit_code=0
+[2026-06-15 15:18:38.852]   Caption                     : Porta de comunica‡Æo (COM1)
+[2026-06-15 15:18:38.853]   Description                 : Porta de comunica‡Æo
+[2026-06-15 15:18:38.853]   InstallDate                 : 
+[2026-06-15 15:18:38.854]   Name                        : Porta de comunica‡Æo (COM1)
+[2026-06-15 15:18:38.854]   Status                      : OK
+[2026-06-15 15:18:38.854]   Availability                : 2
+[2026-06-15 15:18:38.855]   ConfigManagerErrorCode      : 0
+[2026-06-15 15:18:38.855]   ConfigManagerUserConfig     : False
+[2026-06-15 15:18:38.855]   CreationClassName           : Win32_SerialPort
+[2026-06-15 15:18:38.856]   DeviceID                    : COM1
+[2026-06-15 15:18:38.856]   ErrorCleared                : 
+[2026-06-15 15:18:38.856]   ErrorDescription            : 
+[2026-06-15 15:18:38.857]   LastErrorCode               : 
+[2026-06-15 15:18:38.857]   PNPDeviceID                 : ACPI\PNP0501\0
+[2026-06-15 15:18:38.857]   PowerManagementCapabilities : {1}
+[2026-06-15 15:18:38.858]   PowerManagementSupported    : False
+[2026-06-15 15:18:38.858]   StatusInfo                  : 3
+[2026-06-15 15:18:38.858]   SystemCreationClassName     : Win32_ComputerSystem
+[2026-06-15 15:18:38.859]   SystemName                  : PICHAUP-TVJ89LI
+[2026-06-15 15:18:38.859]   MaxNumberControlled         : 
+[2026-06-15 15:18:38.859]   ProtocolSupported           : 
+[2026-06-15 15:18:38.860]   TimeOfLastReset             : 
+[2026-06-15 15:18:38.860]   Capabilities                : 
+[2026-06-15 15:18:38.860]   CapabilityDescriptions      : 
+[2026-06-15 15:18:38.861]   MaxBaudRate                 : 115200
+[2026-06-15 15:18:38.861]   Binary                      : True
+[2026-06-15 15:18:38.862]   MaximumInputBufferSize      : 0
+[2026-06-15 15:18:38.862]   MaximumOutputBufferSize     : 0
+[2026-06-15 15:18:38.862]   OSAutoDiscovered            : True
+[2026-06-15 15:18:38.863]   ProviderType                : RS232 Serial Port
+[2026-06-15 15:18:38.863]   SettableBaudRate            : True
+[2026-06-15 15:18:38.863]   SettableDataBits            : True
+[2026-06-15 15:18:38.864]   SettableFlowControl         : True
+[2026-06-15 15:18:38.864]   SettableParity              : True
+[2026-06-15 15:18:38.864]   SettableParityCheck         : True
+[2026-06-15 15:18:38.865]   SettableRLSD                : True
+[2026-06-15 15:18:38.865]   SettableStopBits            : True
+[2026-06-15 15:18:38.865]   Supports16BitMode           : False
+[2026-06-15 15:18:38.866]   SupportsDTRDSR              : True
+[2026-06-15 15:18:38.868]   SupportsElapsedTimeouts     : True
+[2026-06-15 15:18:38.868]   SupportsIntTimeouts         : True
+[2026-06-15 15:18:38.869]   SupportsParityCheck         : True
+[2026-06-15 15:18:38.869]   SupportsRLSD                : True
+[2026-06-15 15:18:38.869]   SupportsRTSCTS              : True
+[2026-06-15 15:18:38.870]   SupportsSpecialCharacters   : False
+[2026-06-15 15:18:38.870]   SupportsXOnXOff             : True
+[2026-06-15 15:18:38.870]   SupportsXOnXOffSet          : True
+[2026-06-15 15:18:38.871]   PSComputerName              : 
+[2026-06-15 15:18:38.871]   CimClass                    : root/cimv2:Win32_SerialPort
+[2026-06-15 15:18:38.871]   CimInstanceProperties       : {Caption, Description, InstallDate, Name...}
+[2026-06-15 15:18:38.872]   CimSystemProperties         : Microsoft.Management.Infrastructure.CimSystemProperties
+[2026-06-15 15:18:38.872] $ powershell -NoProfile -Command Get-PnpDevice -Class Ports | Format-List *
+[2026-06-15 15:18:39.307] exit_code=0
+[2026-06-15 15:18:39.308]   Class                       : Ports
+[2026-06-15 15:18:39.309]   FriendlyName                : Porta de comunica‡Æo (COM1)
+[2026-06-15 15:18:39.309]   InstanceId                  : ACPI\PNP0501\0
+[2026-06-15 15:18:39.309]   Problem                     : CM_PROB_NONE
+[2026-06-15 15:18:39.310]   ConfigManagerErrorCode      : CM_PROB_NONE
+[2026-06-15 15:18:39.310]   ProblemDescription          : 
+[2026-06-15 15:18:39.310]   Caption                     : Porta de comunica‡Æo (COM1)
+[2026-06-15 15:18:39.311]   Description                 : Porta de comunica‡Æo
+[2026-06-15 15:18:39.311]   InstallDate                 : 
+[2026-06-15 15:18:39.311]   Name                        : Porta de comunica‡Æo (COM1)
+[2026-06-15 15:18:39.312]   Status                      : OK
+[2026-06-15 15:18:39.312]   Availability                : 
+[2026-06-15 15:18:39.313]   ConfigManagerUserConfig     : False
+[2026-06-15 15:18:39.313]   CreationClassName           : Win32_PnPEntity
+[2026-06-15 15:18:39.313]   DeviceID                    : ACPI\PNP0501\0
+[2026-06-15 15:18:39.314]   ErrorCleared                : 
+[2026-06-15 15:18:39.314]   ErrorDescription            : 
+[2026-06-15 15:18:39.314]   LastErrorCode               : 
+[2026-06-15 15:18:39.315]   PNPDeviceID                 : ACPI\PNP0501\0
+[2026-06-15 15:18:39.315]   PowerManagementCapabilities : 
+[2026-06-15 15:18:39.315]   PowerManagementSupported    : 
+[2026-06-15 15:18:39.316]   StatusInfo                  : 
+[2026-06-15 15:18:39.316]   SystemCreationClassName     : Win32_ComputerSystem
+[2026-06-15 15:18:39.316]   SystemName                  : PICHAUP-TVJ89LI
+[2026-06-15 15:18:39.317]   ClassGuid                   : {4d36e978-e325-11ce-bfc1-08002be10318}
+[2026-06-15 15:18:39.317]   CompatibleID                : 
+[2026-06-15 15:18:39.317]   HardwareID                  : {ACPI\VEN_PNP&DEV_0501, ACPI\PNP0501, *PNP0501}
+[2026-06-15 15:18:39.317]   Manufacturer                : (Tipos de porta padrÆo)
+[2026-06-15 15:18:39.318]   PNPClass                    : Ports
+[2026-06-15 15:18:39.318]   Present                     : True
+[2026-06-15 15:18:39.318]   Service                     : Serial
+[2026-06-15 15:18:39.319]   PSComputerName              : 
+[2026-06-15 15:18:39.319]   CimClass                    : ROOT/cimv2:Win32_PnPEntity
+[2026-06-15 15:18:39.319]   CimInstanceProperties       : {Caption, Description, InstallDate, Name...}
+[2026-06-15 15:18:39.319]   CimSystemProperties         : Microsoft.Management.Infrastructure.CimSystemProperties
+[2026-06-15 15:18:39.320]   
+[2026-06-15 15:18:39.320]   Class                       : Ports
+[2026-06-15 15:18:39.320]   FriendlyName                : USB Serial Port (COM3)
+[2026-06-15 15:18:39.321]   InstanceId                  : FTDIBUS\VID_0403+PID_6001+A9O5HZZNA\0000
+[2026-06-15 15:18:39.321]   Problem                     : CM_PROB_NONE
+[2026-06-15 15:18:39.321]   ConfigManagerErrorCode      : CM_PROB_NONE
+[2026-06-15 15:18:39.321]   ProblemDescription          : 
+[2026-06-15 15:18:39.322]   Caption                     : USB Serial Port (COM3)
+[2026-06-15 15:18:39.322]   Description                 : USB Serial Port
+[2026-06-15 15:18:39.322]   InstallDate                 : 
+[2026-06-15 15:18:39.323]   Name                        : USB Serial Port (COM3)
+[2026-06-15 15:18:39.323]   Status                      : OK
+[2026-06-15 15:18:39.323]   Availability                : 
+[2026-06-15 15:18:39.323]   ConfigManagerUserConfig     : False
+[2026-06-15 15:18:39.324]   CreationClassName           : Win32_PnPEntity
+[2026-06-15 15:18:39.324]   DeviceID                    : FTDIBUS\VID_0403+PID_6001+A9O5HZZNA\0000
+[2026-06-15 15:18:39.324]   ErrorCleared                : 
+[2026-06-15 15:18:39.325]   ErrorDescription            : 
+[2026-06-15 15:18:39.325]   LastErrorCode               : 
+[2026-06-15 15:18:39.325]   PNPDeviceID                 : FTDIBUS\VID_0403+PID_6001+A9O5HZZNA\0000
+[2026-06-15 15:18:39.326]   PowerManagementCapabilities : 
+[2026-06-15 15:18:39.326]   PowerManagementSupported    : 
+[2026-06-15 15:18:39.326]   StatusInfo                  : 
+[2026-06-15 15:18:39.326]   SystemCreationClassName     : Win32_ComputerSystem
+[2026-06-15 15:18:39.327]   SystemName                  : PICHAUP-TVJ89LI
+[2026-06-15 15:18:39.327]   ClassGuid                   : {4d36e978-e325-11ce-bfc1-08002be10318}
+[2026-06-15 15:18:39.327]   CompatibleID                : 
+[2026-06-15 15:18:39.328]   HardwareID                  : {FTDIBUS\COMPORT&VID_0403&PID_6001}
+[2026-06-15 15:18:39.328]   Manufacturer                : FTDI
+[2026-06-15 15:18:39.328]   PNPClass                    : Ports
+[2026-06-15 15:18:39.329]   Present                     : True
+[2026-06-15 15:18:39.329]   Service                     : FTSER2K
+[2026-06-15 15:18:39.329]   PSComputerName              : 
+[2026-06-15 15:18:39.330]   CimClass                    : ROOT/cimv2:Win32_PnPEntity
+[2026-06-15 15:18:39.330]   CimInstanceProperties       : {Caption, Description, InstallDate, Name...}
+[2026-06-15 15:18:39.330]   CimSystemProperties         : Microsoft.Management.Infrastructure.CimSystemProperties
+[2026-06-15 15:18:39.330] $ powershell -NoProfile -Command Get-PnpDevice -Class USB | Format-Table -AutoSize
+[2026-06-15 15:18:39.733] exit_code=0
+[2026-06-15 15:18:39.734]   Status  Class FriendlyName                                                                     InstanceId              
+[2026-06-15 15:18:39.735]   ------  ----- ------------                                                                     ----------              
+[2026-06-15 15:18:39.735]   OK      USB   Intel(R) USB 3.1 eXtensible Host Controller - 1.10 (Microsoft)                   PCI\VEN_8086&DEV_A36D...
+[2026-06-15 15:18:39.735]   Unknown USB   Dispositivo USB Desconhecido (Falha na Solicita‡Æo de Descritor de Configura‡Æo) USB\VID_0000&PID_0003...
+[2026-06-15 15:18:39.736]   OK      USB   USB Composite Device                                                             USB\VID_2A7A&PID_8A57...
+[2026-06-15 15:18:39.736]   Unknown USB   USB Composite Device                                                             USB\VID_2A7A&PID_8A57...
+[2026-06-15 15:18:39.736]   OK      USB   USB Root Hub (USB 3.0)                                                           USB\ROOT_HUB30\4&1AF8...
+[2026-06-15 15:18:39.737]   Unknown USB   USB Composite Device                                                             USB\VID_1BCF&PID_08B8...
+[2026-06-15 15:18:39.737]   Unknown USB   USB Mass Storage Device                                                          USB\VID_0951&PID_1666...
+[2026-06-15 15:18:39.737]   Unknown USB   Dispositivo USB Desconhecido (Falha na Solicita‡Æo de Descritor de Dispositivo)  USB\VID_0000&PID_0002...
+[2026-06-15 15:18:39.738]   OK      USB   USB Serial Converter                                                             USB\VID_0403&PID_6001...
+
+[2026-06-15 15:18:39.738] ================================================================================
+[2026-06-15 15:18:39.739] PORTAS SELECIONADAS PARA TESTE
+[2026-06-15 15:18:39.739] ================================================================================
+[2026-06-15 15:18:39.739] COM3
+
+[2026-06-15 15:18:39.740] ================================================================================
+[2026-06-15 15:18:39.740] TESTE DE LEITURA SERIAL: porta=COM3 baudrate=9600 duração=120s
+[2026-06-15 15:18:39.741] ================================================================================
+[2026-06-15 15:18:39.747] Porta aberta.
+[2026-06-15 15:18:39.747] Status inicial: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:18:39.747] Buffers limpos.
+[2026-06-15 15:18:40.900] BLOCO #1: 44 bytes | hex=30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a 53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='0000kg\r\nST,GS,+0000000kg\r\nST,GS,+0000000kg\r\n'
+[2026-06-15 15:18:40.901] LINHA INVÁLIDA #1: '0000kg'
+[2026-06-15 15:18:40.904] LINHA VÁLIDA #1: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 15:18:40.905] LINHA VÁLIDA #2: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 15:18:41.031] BLOCO #2: 5 bytes | hex=53 54 2c 47 53 | ascii='ST,GS'
+[2026-06-15 15:18:41.053] BLOCO #3: 13 bytes | hex=2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii=',+0000000kg\r\n'
+[2026-06-15 15:18:41.054] LINHA VÁLIDA #3: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 15:18:41.370] BLOCO #4: 11 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 | ascii='ST,GS,+0000'
+[2026-06-15 15:18:41.381] BLOCO #5: 7 bytes | hex=30 30 30 6b 67 0d 0a | ascii='000kg\r\n'
+[2026-06-15 15:18:41.384] LINHA VÁLIDA #4: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 15:18:41.710] BLOCO #6: 14 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 | ascii='ST,GS,+0000000'
+[2026-06-15 15:18:41.722] BLOCO #7: 4 bytes | hex=6b 67 0d 0a | ascii='kg\r\n'
+[2026-06-15 15:18:41.723] LINHA VÁLIDA #5: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 15:18:42.027] BLOCO #8: 2 bytes | hex=53 54 | ascii='ST'
+[2026-06-15 15:18:42.049] BLOCO #9: 16 bytes | hex=2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii=',GS,+0000000kg\r\n'
+[2026-06-15 15:18:42.050] LINHA VÁLIDA #6: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 15:18:42.377] BLOCO #10: 15 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b | ascii='ST,GS,+0000000k'
+[2026-06-15 15:18:42.388] BLOCO #11: 3 bytes | hex=67 0d 0a | ascii='g\r\n'
+[2026-06-15 15:18:42.389] LINHA VÁLIDA #7: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 15:18:42.703] BLOCO #12: 6 bytes | hex=53 54 2c 47 53 2c | ascii='ST,GS,'
+[2026-06-15 15:18:42.726] BLOCO #13: 12 bytes | hex=2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='+0000000kg\r\n'
+[2026-06-15 15:18:42.727] LINHA VÁLIDA #8: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 15:18:43.031] BLOCO #14: 7 bytes | hex=53 54 2c 47 53 2c 2b | ascii='ST,GS,+'
+[2026-06-15 15:18:43.053] BLOCO #15: 11 bytes | hex=30 30 30 30 30 30 30 6b 67 0d 0a | ascii='0000000kg\r\n'
+[2026-06-15 15:18:43.054] LINHA VÁLIDA #9: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 15:18:43.370] BLOCO #16: 13 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 | ascii='ST,GS,+000000'
+[2026-06-15 15:18:43.392] BLOCO #17: 5 bytes | hex=30 6b 67 0d 0a | ascii='0kg\r\n'
+[2026-06-15 15:18:43.393] LINHA VÁLIDA #10: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 15:18:43.707] BLOCO #18: 15 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b | ascii='ST,GS,+0000000k'
+[2026-06-15 15:18:43.729] BLOCO #19: 3 bytes | hex=67 0d 0a | ascii='g\r\n'
+[2026-06-15 15:18:43.730] LINHA VÁLIDA #11: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 15:18:44.034] BLOCO #20: 8 bytes | hex=53 54 2c 47 53 2c 2b 30 | ascii='ST,GS,+0'
+[2026-06-15 15:18:44.056] BLOCO #21: 10 bytes | hex=30 30 30 30 30 30 6b 67 0d 0a | ascii='000000kg\r\n'
+[2026-06-15 15:18:44.057] LINHA VÁLIDA #12: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 15:18:44.372] BLOCO #22: 13 bytes | hex=53 54 2c 47 53 2c 2b 30 30 30 30 30 30 | ascii='ST,GS,+000000'
+[2026-06-15 15:18:44.384] BLOCO #23: 5 bytes | hex=30 6b 67 0d 0a | ascii='0kg\r\n'
+[2026-06-15 15:18:44.385] LINHA VÁLIDA #13: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 15:18:44.689] BLOCO #24: 1 bytes | hex=53 | ascii='S'
+[2026-06-15 15:18:44.711] BLOCO #25: 15 bytes | hex=54 2c 47 53 2c 2b 30 30 30 30 30 30 30 6b 67 | ascii='T,GS,+0000000kg'
+[2026-06-15 15:18:44.723] BLOCO #26: 2 bytes | hex=0d 0a | ascii='\r\n'
+[2026-06-15 15:18:44.724] LINHA VÁLIDA #14: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 15:18:44.757] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:18:45.030] BLOCO #27: 4 bytes | hex=53 54 2c 47 | ascii='ST,G'
+[2026-06-15 15:18:46.657] BLOCO #28: 14 bytes | hex=53 2c 2b 30 30 30 30 30 30 30 6b 67 0d 0a | ascii='S,+0000000kg\r\n'
+[2026-06-15 15:18:46.658] LINHA VÁLIDA #15: 'ST,GS,+0000000kg' peso=0 status=ST
+[2026-06-15 15:18:49.757] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:18:54.755] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:18:59.755] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:19:04.750] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:19:09.755] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:19:14.750] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:19:19.758] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:19:24.753] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:19:29.755] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:19:34.757] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:19:39.752] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:19:44.756] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:19:49.752] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:19:54.752] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:19:59.750] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:20:04.754] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:20:09.755] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:20:14.754] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:20:19.755] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:20:24.750] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:20:29.752] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:20:34.749] Status periódico: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:20:39.750] Status final: {"is_open": true, "name": "COM3", "in_waiting": 0, "out_waiting": 0, "cts": false, "dsr": false, "ri": false, "cd": false, "rts": true, "dtr": true}
+[2026-06-15 15:20:40.406] RESUMO DA PORTA: {
+  "bytes": 278,
+  "blocks": 28,
+  "lines": 16,
+  "valid_weight_lines": 15,
+  "invalid_lines": 1,
+  "serial_errors": 0,
+  "max_gap_seconds": 1.6271711000008509,
+  "first_byte_at": "2026-06-15 15:18:40.899",
+  "last_byte_at": "2026-06-15 15:18:46.657"
+}
+
+[2026-06-15 15:20:40.414] ================================================================================
+[2026-06-15 15:20:40.415] FIM DO DEBUG2
+[2026-06-15 15:20:40.416] ================================================================================
+[2026-06-15 15:20:40.418] Log gerado: C:\Users\Pichau\Documents\debug2_PICHAUP-TVJ89LI_20260615_151838.log
+[2026-06-15 15:20:40.419] Resumo CSV gerado: C:\Users\Pichau\Documents\debug2_PICHAUP-TVJ89LI_20260615_151838.csv
