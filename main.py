@@ -1,3 +1,4 @@
+import argparse
 import csv
 import re
 import time
@@ -23,6 +24,7 @@ DELIMITADOR_CSV = ";"
 
 PADRAO_PESO = re.compile(r"(ST|US),GS,([+-]\d+)kg")
 
+modo_verbose = False
 ultimo_peso_impresso = None
 ultimo_print = 0
 ultimo_dado_recebido = time.time()
@@ -33,6 +35,22 @@ peso_candidato = None
 inicio_peso_candidato = None
 pesagem_registrada = False
 ultima_pesagem_registrada_kg = None
+
+
+def configurar_argumentos():
+    parser = argparse.ArgumentParser(
+        description="Lê pesos enviados pela balança serial e registra pesagens estáveis."
+    )
+    parser.add_argument(
+        "-verbose",
+        "--verbose",
+        action="store_true",
+        help=(
+            "lista todos os pesos válidos recebidos da balança, sem aplicar "
+            "o filtro de intervalo/mudança usado na saída padrão"
+        ),
+    )
+    return parser.parse_args()
 
 
 def agora():
@@ -276,7 +294,12 @@ def processar_linha(linha):
     status_balanca, peso = resultado
     agora_time = time.time()
 
-    if peso != ultimo_peso_impresso and agora_time - ultimo_print >= INTERVALO_IMPRESSAO:
+    if modo_verbose:
+        print(
+            f"[{agora()}] Peso recebido: {peso} kg | status recebido: "
+            f"{status_balanca}"
+        )
+    elif peso != ultimo_peso_impresso and agora_time - ultimo_print >= INTERVALO_IMPRESSAO:
         print(
             f"[{agora()}] Peso: {peso} kg | status recebido: {status_balanca} "
             "| estabilidade calculada por faixa candidata"
@@ -326,7 +349,10 @@ def reconectar(ser, motivo):
 
 
 def main():
-    global ultimo_dado_recebido, buffer
+    global ultimo_dado_recebido, buffer, modo_verbose
+
+    args = configurar_argumentos()
+    modo_verbose = args.verbose
 
     if not criar_arquivo_csv_com_permissao():
         return
@@ -334,6 +360,9 @@ def main():
     ser = conectar()
 
     print(f"[{agora()}] Lendo balança. Ctrl+C para parar.")
+    if modo_verbose:
+        print(f"[{agora()}] Modo verbose ativo: listando todos os pesos recebidos.")
+
     print(
         f"[{agora()}] MVP ativo: registra em {ARQUIVO_CSV} quando peso > "
         f"{LIMITE_PESO_KG} kg e permanece dentro de +/- "

@@ -179,6 +179,28 @@ Criar um serviço/script que:
 
 ---
 
+## Uso
+
+Executar no modo padrão:
+
+```bash
+python main.py
+```
+
+Para listar todos os pesos válidos que chegam da balança, sem o filtro de intervalo/mudança da saída padrão, use o modo verbose:
+
+```bash
+python main.py -verbose
+```
+
+Também é aceito o alias longo:
+
+```bash
+python main.py --verbose
+```
+
+---
+
 ## Dependências
 
 Instalar:
