@@ -1,26 +1,29 @@
 import argparse
-import csv
 import re
+import sys
 import time
+import threading
 from collections import deque
 from datetime import datetime
 from pathlib import Path
 
 import serial
+import numpy as np
 from serial import SerialException
 
-PORTA = "COM3"
+from camera import Camera, carregar_url, salvar_jpeg
+
+PORTA = "COM5"
 BAUDRATE = 9600
 
 INTERVALO_IMPRESSAO = 5
 TEMPO_SEM_DADOS_PARA_RECONECTAR = 15
 
 LIMITE_PESO_KG = 1000
-TEMPO_ESTABILIDADE_SEGUNDOS = 10
+TEMPO_ESTABILIDADE_SEGUNDOS = 5
 OSCILACAO_MAXIMA_KG = 20
 PESO_RESET_KG = 300
-ARQUIVO_CSV = Path("pesagens.csv")
-DELIMITADOR_CSV = ";"
+PASTA_DADOS = Path(__file__).resolve().parent / "AutoWeightData"
 
 PADRAO_PESO = re.compile(r"(ST|US),GS,([+-]\d+)kg")
 
@@ -35,6 +38,24 @@ peso_candidato = None
 inicio_peso_candidato = None
 pesagem_registrada = False
 ultima_pesagem_registrada_kg = None
+camera = None
+ultima_foto = None
+ultima_tentativa_foto = float("-inf")
+parar = threading.Event()
+estado_lock = threading.Lock()
+estado = {"peso": None, "recebido": None, "foto": None,
+          "hora": None, "peso_foto": None, "foto_branca": False,
+          "mensagem": "Iniciando…"}
+
+
+def atualizar_estado(**valores):
+    with estado_lock:
+        estado.update(valores)
+
+
+def obter_estado():
+    with estado_lock:
+        return estado.copy()
 
 
 def configurar_argumentos():
@@ -50,6 +71,7 @@ def configurar_argumentos():
             "o filtro de intervalo/mudança usado na saída padrão"
         ),
     )
+    parser.add_argument("--sem-gui", action="store_true", help="executa apenas no terminal")
     return parser.parse_args()
 
 
@@ -58,8 +80,9 @@ def agora():
 
 
 def conectar():
-    while True:
+    while not parar.is_set():
         try:
+            atualizar_estado(mensagem=f"Conectando à balança ({PORTA})…", peso=None)
             print(f"[{agora()}] Abrindo {PORTA}...")
             ser = serial.Serial(
                 port=PORTA,
@@ -78,11 +101,13 @@ def conectar():
             ser.reset_output_buffer()
 
             print(f"[{agora()}] Conectado.")
+            atualizar_estado(mensagem="Aguardando peso da balança…")
             return ser
 
         except Exception as e:
             print(f"[{agora()}] Erro ao conectar: {repr(e)}")
-            time.sleep(5)
+            atualizar_estado(mensagem=f"Balança indisponível ({PORTA}). Tentando reconectar…", peso=None)
+            parar.wait(5)
 
 
 def extrair_peso(linha):
@@ -97,97 +122,45 @@ def extrair_peso(linha):
     return status_balanca, peso
 
 
-CAMPOS_CSV = ["data_hora", "peso_maximo_janela_kg"]
+def registrar_pesagem_foto(amostras, substituir_ultima=False):
+    global ultima_foto, ultima_tentativa_foto
 
-
-def criar_arquivo_csv_com_permissao():
-    if ARQUIVO_CSV.exists():
-        return True
-
+    if time.monotonic() - ultima_tentativa_foto < 3:
+        return None
+    ultima_tentativa_foto = time.monotonic()
+    peso_maximo = max(peso for _, peso in amostras)
+    horario = datetime.now()
+    nome = horario.strftime("%Y-%m-%d-%H-%M-%S-%f")
+    destino = PASTA_DADOS / f"{nome}-{peso_maximo}kg.jpg"
+    foto_branca = False
     try:
-        resposta = input(
-            f"[{agora()}] O arquivo {ARQUIVO_CSV} não existe. "
-            "Deseja criá-lo agora? [s/N] "
-        )
-    except EOFError:
-        resposta = ""
+        frame = camera.foto_recente() if camera is not None else None
+        if frame is None:
+            raise RuntimeError("Sem imagem recente da câmera")
+        salvar_jpeg(frame, destino)
+    except Exception as erro:
+        foto_branca = True
+        print(f"[{agora()}] Foto indisponível ({type(erro).__name__}); "
+              "registrando imagem em branco.")
+        try:
+            salvar_jpeg(np.full((1080, 1920, 3), 255, dtype=np.uint8), destino)
+        except Exception as erro_branco:
+            atualizar_estado(mensagem="Falha ao salvar a pesagem. Nova tentativa em breve.")
+            print(f"[{agora()}] Não foi possível gravar a imagem em branco "
+                  f"({type(erro_branco).__name__}). "
+                  "Pesagem ainda não registrada; haverá nova tentativa.")
+            return None
 
-    if resposta.strip().lower() not in {"s", "sim", "y", "yes"}:
-        print(
-            f"[{agora()}] Arquivo {ARQUIVO_CSV} não criado. "
-            "Encerrando para evitar perder registros de pesagem."
-        )
-        return False
-
-    ARQUIVO_CSV.parent.mkdir(parents=True, exist_ok=True)
-
-    with ARQUIVO_CSV.open("w", newline="", encoding="utf-8") as arquivo:
-        writer = csv.DictWriter(
-            arquivo, fieldnames=CAMPOS_CSV, delimiter=DELIMITADOR_CSV
-        )
-        writer.writeheader()
-
-    print(f"[{agora()}] Arquivo {ARQUIVO_CSV} criado com sucesso.")
-    return True
-
-
-def escrever_linhas_csv(linhas):
-    ARQUIVO_CSV.parent.mkdir(parents=True, exist_ok=True)
-
-    with ARQUIVO_CSV.open("w", newline="", encoding="utf-8") as arquivo:
-        writer = csv.DictWriter(
-            arquivo, fieldnames=CAMPOS_CSV, delimiter=DELIMITADOR_CSV
-        )
-        writer.writeheader()
-        writer.writerows(linhas)
-
-
-def ler_linhas_csv():
-    if not ARQUIVO_CSV.exists() or ARQUIVO_CSV.stat().st_size == 0:
-        return []
-
-    with ARQUIVO_CSV.open("r", newline="", encoding="utf-8") as arquivo:
-        reader = csv.DictReader(arquivo, delimiter=DELIMITADOR_CSV)
-        return list(reader)
-
-
-def registrar_pesagem_csv(amostras, substituir_ultima=False):
-    ARQUIVO_CSV.parent.mkdir(parents=True, exist_ok=True)
-    arquivo_existe = ARQUIVO_CSV.exists() and ARQUIVO_CSV.stat().st_size > 0
-
-    pesos = [peso_amostra for _, peso_amostra in amostras]
-    peso_maximo = max(pesos)
-    linha = {
-        "data_hora": agora(),
-        "peso_maximo_janela_kg": peso_maximo,
-    }
-
-    if substituir_ultima and arquivo_existe:
-        linhas = ler_linhas_csv()
-
-        if linhas:
-            linhas[-1] = linha
-            escrever_linhas_csv(linhas)
-            print(
-                f"[{agora()}] Última pesagem substituída em {ARQUIVO_CSV}: "
-                f"novo peso máximo da janela: {peso_maximo} kg"
-            )
-            return peso_maximo
-
-    with ARQUIVO_CSV.open("a", newline="", encoding="utf-8") as arquivo:
-        writer = csv.DictWriter(
-            arquivo, fieldnames=CAMPOS_CSV, delimiter=DELIMITADOR_CSV
-        )
-
-        if not arquivo_existe:
-            writer.writeheader()
-
-        writer.writerow(linha)
-
-    print(
-        f"[{agora()}] Pesagem registrada em {ARQUIVO_CSV}: "
-        f"peso máximo da janela: {peso_maximo} kg"
-    )
+    anterior = ultima_foto
+    ultima_foto = destino
+    atualizar_estado(foto=destino, hora=horario, peso_foto=peso_maximo,
+                     foto_branca=foto_branca, mensagem="Pesagem registrada.")
+    if substituir_ultima and anterior is not None:
+        try:
+            anterior.unlink(missing_ok=True)
+        except OSError:
+            print(f"[{agora()}] Foto nova salva, mas a anterior não pôde ser removida: {anterior.name}")
+    print(f"[{agora()}] Pesagem registrada: {destino}")
     return peso_maximo
 
 
@@ -270,10 +243,13 @@ def avaliar_pesagem(peso):
     duracao_candidato = timestamp_atual - inicio_peso_candidato
 
     if duracao_candidato >= TEMPO_ESTABILIDADE_SEGUNDOS:
-        ultima_pesagem_registrada_kg = registrar_pesagem_csv(
+        peso_registrado = registrar_pesagem_foto(
             list(amostras_estabilidade),
             substituir_ultima=substituir_ultima,
         )
+        if peso_registrado is None:
+            return
+        ultima_pesagem_registrada_kg = peso_registrado
         pesagem_registrada = True
         limpar_candidato()
         print(
@@ -292,6 +268,7 @@ def processar_linha(linha):
         return
 
     status_balanca, peso = resultado
+    atualizar_estado(peso=peso, recebido=time.monotonic(), mensagem="Recebendo peso da balança")
     agora_time = time.time()
 
     if modo_verbose:
@@ -339,7 +316,9 @@ def reconectar(ser, motivo):
     except Exception:
         pass
 
-    time.sleep(2)
+    limpar_candidato()
+    atualizar_estado(peso=None, mensagem="Reconectando à balança…")
+    parar.wait(2)
     novo_ser = conectar()
 
     ultimo_dado_recebido = time.time()
@@ -348,30 +327,37 @@ def reconectar(ser, motivo):
     return novo_ser
 
 
-def main():
-    global ultimo_dado_recebido, buffer, modo_verbose
+def executar(verbose=False):
+    global ultimo_dado_recebido, buffer, modo_verbose, camera
 
-    args = configurar_argumentos()
-    modo_verbose = args.verbose
+    modo_verbose = verbose
+    ser = None
 
-    if not criar_arquivo_csv_com_permissao():
+    try:
+        camera = Camera(carregar_url())
+        PASTA_DADOS.mkdir(parents=True, exist_ok=True)
+    except (RuntimeError, OSError) as erro:
+        print(f"[{agora()}] {erro}")
+        atualizar_estado(mensagem=str(erro))
         return
 
-    ser = conectar()
+    camera.start()
 
     print(f"[{agora()}] Lendo balança. Ctrl+C para parar.")
     if modo_verbose:
         print(f"[{agora()}] Modo verbose ativo: listando todos os pesos recebidos.")
 
     print(
-        f"[{agora()}] MVP ativo: registra em {ARQUIVO_CSV} quando peso > "
+        f"[{agora()}] Registro por foto ativo: salva em {PASTA_DADOS} quando peso > "
         f"{LIMITE_PESO_KG} kg e permanece dentro de +/- "
         f"{OSCILACAO_MAXIMA_KG} kg do candidato por "
         f"{TEMPO_ESTABILIDADE_SEGUNDOS}s."
     )
 
     try:
-        while True:
+        ser = conectar()
+        ultimo_dado_recebido = time.time()
+        while not parar.is_set() and ser is not None:
             try:
                 n = ser.in_waiting
 
@@ -392,7 +378,7 @@ def main():
                         f"Sem dados há {tempo_sem_dados:.1f}s",
                     )
 
-                time.sleep(0.05)
+                parar.wait(0.05)
 
             except SerialException as e:
                 ser = reconectar(ser, f"Erro serial: {repr(e)}")
@@ -400,11 +386,25 @@ def main():
     except KeyboardInterrupt:
         print(f"[{agora()}] Encerrando...")
 
+    except Exception as erro:
+        atualizar_estado(peso=None, mensagem=f"Leitura interrompida: {type(erro).__name__}. Reinicie o programa.")
+        print(f"[{agora()}] Leitura interrompida: {erro!r}")
+
     finally:
+        camera.close()
         try:
             ser.close()
         except Exception:
             pass
+
+
+def main():
+    args = configurar_argumentos()
+    if args.sem_gui:
+        executar(args.verbose)
+    else:
+        from gui import iniciar
+        iniciar(sys.modules[__name__], args.verbose)
 
 
 if __name__ == "__main__":

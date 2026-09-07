@@ -1,3 +1,9 @@
 pesagens.csv
 *.log
 __pycache__/
+camera.local.json
+AutoWeightData/
+teste-camera.jpg
+.codex/
+.env
+.env.*
