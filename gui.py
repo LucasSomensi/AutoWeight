@@ -4,27 +4,34 @@ import threading
 import time
 import tkinter as tk
 from datetime import datetime
+from pathlib import Path
+import sys
 
 import cv2
 import numpy as np
+from camera import MARCADOR_CONTINGENCIA
 
 
 def formatar_peso(peso):
     return "—" if peso is None else f"{peso:,}".replace(",", ".")
 
 
-def ultimo_registro(pasta):
-    """Recupera a última pesagem pelo nome publicado pelo gravador."""
-    if not pasta.exists():
-        return None
-    for caminho in sorted(pasta.glob("*.jpg"), reverse=True):
+def listar_registros(pasta):
+    """Lista as pesagens salvas, da mais antiga à mais recente."""
+    registros = []
+    for caminho in sorted(pasta.glob("*.jpg")):
         try:
             data, peso = caminho.stem.rsplit("-", 1)
             horario = datetime.strptime(data, "%Y-%m-%d-%H-%M-%S-%f")
-            return caminho, horario, int(peso.removesuffix("kg"))
+            registros.append((caminho, horario, int(peso.removesuffix("kg"))))
         except ValueError:
             continue
-    return None
+    return registros
+
+
+def ultimo_registro(pasta):
+    registros = listar_registros(pasta)
+    return registros[-1] if registros else None
 
 
 class Painel:
@@ -34,7 +41,12 @@ class Painel:
         self.frame = None
         self.imagem = None
         self.fechando = False
+        self.registros = []
+        self.ultimo_evento_foto = None
         root.title("AutoWeight • Sala da balança")
+        icone = Path(__file__).resolve().parent / "assets" / "robot.ico"
+        if sys.platform == "win32" and icone.exists():
+            root.iconbitmap(default=str(icone))
         root.geometry("1100x800")
         root.minsize(760, 600)
         root.configure(bg="#eef2f6")
@@ -44,6 +56,11 @@ class Painel:
         topo.pack(fill="x")
         self.label(topo, "AutoWeight", 24, "#ffffff", "#152b40", bold=True).pack(anchor="w")
         self.label(topo, "MONITORAMENTO DE PESAGEM", 10, "#a9c0d4", "#152b40").pack(anchor="w", pady=(4, 0))
+        self.ausente = tk.Button(topo, text="Modo ausente: DESATIVADO",
+                                 command=app.alternar_modo_ausente,
+                                 font=("Segoe UI", 12, "bold"), relief="flat",
+                                 bg="#e5ebf0", fg="#243b50", padx=12, pady=6)
+        self.ausente.pack(anchor="e", pady=(8, 0))
 
         resumo = tk.Frame(root, bg="#eef2f6")
         resumo.pack(fill="x", padx=28, pady=20)
@@ -67,7 +84,21 @@ class Painel:
 
         registro = tk.Frame(root, bg="white", padx=20, pady=16)
         registro.pack(fill="both", expand=True, padx=28, pady=(0, 16))
-        self.label(registro, "ÚLTIMA FOTO REGISTRADA", 11, bold=True).pack(anchor="w")
+        cabecalho = tk.Frame(registro, bg="white")
+        cabecalho.pack(fill="x")
+        self.label(cabecalho, "FOTOS REGISTRADAS", 11, bold=True).pack(side="left")
+        navegacao = tk.Frame(cabecalho, bg="white")
+        navegacao.pack(side="right")
+        self.anterior = tk.Button(navegacao, text="◀", command=lambda: self.navegar(-1),
+                                  font=("Segoe UI", 15), width=3, relief="flat",
+                                  bg="#e5ebf0", fg="#243b50", state="disabled")
+        self.anterior.pack(side="left")
+        self.posicao = self.label(navegacao, "0 / 0", 11)
+        self.posicao.pack(side="left", padx=12)
+        self.proxima = tk.Button(navegacao, text="▶", command=lambda: self.navegar(1),
+                                 font=("Segoe UI", 15), width=3, relief="flat",
+                                 bg="#e5ebf0", fg="#243b50", state="disabled")
+        self.proxima.pack(side="left")
         self.detalhes = self.label(registro, "Nenhuma pesagem registrada", 17, bold=True)
         self.detalhes.pack(anchor="w", pady=(8, 4))
         self.aviso = self.label(registro, "A foto aparecerá após a gravação da pesagem.", 10)
@@ -79,9 +110,7 @@ class Painel:
         self.status.pack(anchor="w", padx=28, pady=(0, 16))
 
         try:
-            anterior = ultimo_registro(app.PASTA_DADOS)
-            if anterior:
-                self.carregar_foto(*anterior)
+            self.atualizar_registros()
         except OSError:
             self.aviso.configure(text="Não foi possível consultar os registros anteriores.")
         self.worker = threading.Thread(target=app.executar, args=(verbose,), daemon=True)
@@ -97,17 +126,49 @@ class Painel:
         self.foto_atual = caminho
         self.detalhes.configure(text=f"{horario:%d/%m/%Y às %H:%M:%S}   •   {formatar_peso(peso)} kg")
         try:
-            self.frame = cv2.imdecode(np.frombuffer(caminho.read_bytes(), dtype=np.uint8), cv2.IMREAD_COLOR)
+            dados = caminho.read_bytes()
+            contingencia = MARCADOR_CONTINGENCIA in dados[:256]
+            self.frame = cv2.imdecode(np.frombuffer(dados, dtype=np.uint8), cv2.IMREAD_COLOR)
             if self.frame is None:
                 raise ValueError("JPEG inválido")
             branca = branca or bool(np.all(self.frame == 255))
             self.aviso.configure(
-                text="Imagem branca de contingência — foto da câmera indisponível." if branca else "Foto salva com sucesso.",
-                fg="#9a6700" if branca else "#287550")
+                text=("Ilustração em mangá de contingência — câmera indisponível." if contingencia else
+                      "Imagem branca de contingência — foto da câmera indisponível." if branca else "Foto salva com sucesso."),
+                fg="#9a6700" if branca or contingencia else "#287550")
         except (OSError, ValueError, cv2.error):
             self.frame = None
             self.aviso.configure(text="Não foi possível abrir a foto registrada.", fg="#b42318")
         self.desenhar()
+
+    def atualizar_registros(self):
+        acompanhando = not self.registros or self.foto_atual == self.registros[-1][0]
+        self.registros = listar_registros(self.app.PASTA_DADOS)
+        caminhos = [registro[0] for registro in self.registros]
+        if self.registros and (acompanhando or self.foto_atual not in caminhos):
+            if self.foto_atual != self.registros[-1][0]:
+                self.carregar_foto(*self.registros[-1])
+        self.atualizar_botoes()
+
+    def atualizar_botoes(self):
+        caminhos = [registro[0] for registro in self.registros]
+        indice = caminhos.index(self.foto_atual) if self.foto_atual in caminhos else -1
+        self.posicao.configure(text=f"{indice + 1} / {len(self.registros)}")
+        self.anterior.configure(state="normal" if indice > 0 else "disabled")
+        self.proxima.configure(state="normal" if 0 <= indice < len(self.registros) - 1 else "disabled")
+
+    def navegar(self, direcao):
+        try:
+            self.atualizar_registros()
+        except OSError:
+            self.aviso.configure(text="Não foi possível consultar as fotos salvas.", fg="#b42318")
+            return
+        caminhos = [registro[0] for registro in self.registros]
+        if self.foto_atual in caminhos:
+            indice = caminhos.index(self.foto_atual) + direcao
+            if 0 <= indice < len(self.registros):
+                self.carregar_foto(*self.registros[indice])
+        self.atualizar_botoes()
 
     def desenhar(self, event=None):
         self.canvas.delete("all")
@@ -129,15 +190,25 @@ class Painel:
         if self.fechando:
             return
         estado = self.app.obter_estado()
+        ativo = estado.get("modo_ausente", False)
+        self.ausente.configure(text=f"Modo ausente: {'ATIVADO' if ativo else 'DESATIVADO'}",
+                               bg="#287550" if ativo else "#e5ebf0",
+                               fg="white" if ativo else "#243b50", relief="sunken" if ativo else "flat")
         recente = estado["recebido"] is not None and time.monotonic() - estado["recebido"] <= 3
         self.peso.configure(text=formatar_peso(estado["peso"] if recente else None))
         self.balanca.configure(text="Recebendo dados" if recente and estado["peso"] is not None else "Sem leitura recente da balança")
         conectada = self.app.camera is not None and self.app.camera.conectada()
         self.camera.configure(text="● Conectada" if conectada else "● Sem imagem recente",
                               fg="#287550" if conectada else "#b42318")
-        if estado["foto"] is not None and estado["foto"] != self.foto_atual:
-            self.carregar_foto(estado["foto"], estado["hora"], estado["peso_foto"], estado["foto_branca"])
-        self.status.configure(text=estado["mensagem"])
+        if estado["foto"] is not None and estado["foto"] != self.ultimo_evento_foto:
+            try:
+                self.atualizar_registros()
+                self.ultimo_evento_foto = estado["foto"]
+            except OSError:
+                self.aviso.configure(text="Não foi possível consultar as fotos salvas.", fg="#b42318")
+        self.status.configure(text=estado["mensagem"] + (
+            "   •   " + estado["api"] if estado.get("api") else "") + (
+            "   •   " + estado["sirene"] if estado.get("sirene") else ""))
         self.root.after(200, self.atualizar)
 
     def fechar(self):
@@ -154,6 +225,9 @@ class Painel:
 
 
 def iniciar(app, verbose=False):
+    if sys.platform == "win32":
+        import ctypes
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("AutoWeight.Desktop")
     root = tk.Tk()
     Painel(root, app, verbose)
     root.mainloop()

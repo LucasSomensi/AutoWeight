@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 
 import main
-from camera import Camera, salvar_jpeg
+from camera import Camera, salvar_jpeg, carregar_contingencia, MARCADOR_CONTINGENCIA
 
 
 class PesagensTest(unittest.TestCase):
@@ -33,7 +33,7 @@ class PesagensTest(unittest.TestCase):
 
     def test_stability_replacement_and_next_truck(self):
         self.weigh(2000)
-        self.weigh(2020, 4)
+        self.weigh(2020, 2)
         self.assertEqual(list(self.app.PASTA_DADOS.iterdir()), [])
         self.weigh(2000, 1)
         first = self.app.ultima_foto
@@ -50,41 +50,92 @@ class PesagensTest(unittest.TestCase):
         self.weigh(3000, 5)
         self.assertEqual(len(list(self.app.PASTA_DADOS.glob('*.jpg'))), 2)
 
-    def test_camera_failure_saves_white_photo(self):
+    def assert_manga(self, photo):
+        image = cv2.imread(str(photo))
+        original = carregar_contingencia()
+        self.assertEqual(image.shape, original.shape)
+        self.assertLess(np.abs(image.astype(float) - original.astype(float)).mean(), 5)
+        self.assertIn(MARCADOR_CONTINGENCIA, photo.read_bytes()[:256])
+
+    def test_away_only_signals_first_successful_record_per_truck(self):
+        self.app.sirene = Mock()
+        self.assertTrue(self.app.alternar_modo_ausente())
+        self.weigh(2000)
+        with patch.object(main, 'salvar_jpeg', side_effect=OSError('disk full')):
+            self.weigh(2000, 5)
+        self.app.sirene.acionar.assert_not_called()
+        self.weigh(2000, 3)
+        self.app.sirene.acionar.assert_called_once_with()
+        self.weigh(2500)
+        self.weigh(2500, 5)
+        self.app.sirene.acionar.assert_called_once_with()
+        self.weigh(0)
+        self.weigh(3000)
+        self.weigh(3000, 5)
+        self.assertEqual(self.app.sirene.acionar.call_count, 2)
+
+    def test_enabling_after_first_photo_does_not_signal_replacement(self):
+        self.app.sirene = Mock()
+        self.weigh(2000)
+        self.weigh(2000, 5)
+        self.app.sirene.acionar.assert_not_called()
+        self.app.alternar_modo_ausente()
+        self.weigh(2500)
+        self.weigh(2500, 5)
+        self.app.sirene.acionar.assert_not_called()
+
+    def test_away_signals_successful_contingency_record(self):
+        self.app.sirene = Mock()
+        self.app.alternar_modo_ausente()
+        self.app.camera.foto_recente.return_value = None
+        self.weigh(2000)
+        self.weigh(2000, 5)
+        self.app.sirene.acionar.assert_called_once_with()
+
+    def test_camera_failure_saves_manga(self):
         self.app.camera.foto_recente.return_value = None
         self.weigh(2000)
         self.weigh(2000, 5)
         self.assertTrue(self.app.pesagem_registrada)
         photo = self.app.ultima_foto
         self.assertTrue(photo.name.endswith('-2000kg.jpg'))
-        image = cv2.imread(str(photo))
-        self.assertEqual(image.shape, (1080, 1920, 3))
-        self.assertTrue(np.all(image == 255))
+        self.assert_manga(photo)
         self.app.camera.foto_recente.return_value = self.frame
         self.weigh(2000, 3)
         self.assertTrue(self.app.pesagem_registrada)
         self.assertEqual(list(self.app.PASTA_DADOS.iterdir()), [photo])
 
-    def test_encoding_failure_saves_white_photo(self):
+    def test_encoding_failure_saves_manga(self):
         real_save = main.salvar_jpeg
 
-        def fail_original(frame, dest):
+        def fail_original(frame, dest, **kwargs):
             if frame is self.frame:
                 raise ValueError('invalid frame')
-            real_save(frame, dest)
+            real_save(frame, dest, **kwargs)
 
         self.weigh(2000)
         with patch.object(main, 'salvar_jpeg', side_effect=fail_original):
             self.weigh(2000, 5)
         self.assertTrue(self.app.pesagem_registrada)
-        self.assertTrue(np.all(cv2.imread(str(self.app.ultima_foto)) == 255))
+        self.assert_manga(self.app.ultima_foto)
 
-    def test_capture_exception_saves_white_photo(self):
+    def test_capture_exception_saves_manga(self):
         self.app.camera.foto_recente.side_effect = RuntimeError('camera error')
         self.weigh(2000)
         self.weigh(2000, 5)
         self.assertTrue(self.app.pesagem_registrada)
-        self.assertTrue(np.all(cv2.imread(str(self.app.ultima_foto)) == 255))
+        self.assert_manga(self.app.ultima_foto)
+
+    def test_missing_fallback_retries_without_registering(self):
+        self.app.camera.foto_recente.return_value = None
+        self.weigh(2000)
+        with patch.object(main, 'carregar_contingencia', side_effect=OSError('missing')):
+            self.weigh(2000, 5)
+        self.assertFalse(self.app.pesagem_registrada)
+        self.assertEqual(list(self.app.PASTA_DADOS.iterdir()), [])
+        self.weigh(2000, 3)
+        self.assertTrue(self.app.pesagem_registrada)
+        self.assert_manga(self.app.ultima_foto)
 
     def test_failed_replacement_preserves_previous_photo(self):
         self.weigh(2000)

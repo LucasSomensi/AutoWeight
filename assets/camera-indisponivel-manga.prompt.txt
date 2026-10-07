@@ -1,0 +1,4 @@
+Gerado com a ferramenta integrada image_gen.
+Referência: AutoWeightData/2026-09-08-16-30-51-234112-53720kg.jpg
+
+Use case: style-transfer. Transform the reference photograph into a polished black-and-white manga illustration for the AutoWeight application's camera-unavailable fallback. Preserve the landscape 16:9 composition and recognizable scene: truck facing camera on the weighbridge, small building and fence on left, farm fields in distance, tall trees on right. Crisp ink linework, screentone shading and detailed manga backgrounds. Keep the truck and weighbridge geometry faithful. Remove camera timestamp and camera logo overlays. Add a clean legible caption at bottom reading exactly 'CÂMERA INDISPONÍVEL' and below it 'Imagem ilustrativa de contingência'. No extra characters or objects. This is an illustration, clearly not a live camera photograph.

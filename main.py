@@ -3,15 +3,18 @@ import re
 import sys
 import time
 import threading
+import logging
+from logging.handlers import RotatingFileHandler
 from collections import deque
 from datetime import datetime
 from pathlib import Path
 
 import serial
-import numpy as np
 from serial import SerialException
 
-from camera import Camera, carregar_url, salvar_jpeg
+from camera import Camera, carregar_url, salvar_jpeg, carregar_contingencia
+from agrolima import Publicador, Estabilidade, carregar_configuracao
+from sirene import Sirene
 
 PORTA = "COM5"
 BAUDRATE = 9600
@@ -20,7 +23,8 @@ INTERVALO_IMPRESSAO = 5
 TEMPO_SEM_DADOS_PARA_RECONECTAR = 15
 
 LIMITE_PESO_KG = 1000
-TEMPO_ESTABILIDADE_SEGUNDOS = 5
+TEMPO_ESTABILIDADE_SEGUNDOS = 3
+TEMPO_ESTABILIDADE_API_SEGUNDOS = 1
 OSCILACAO_MAXIMA_KG = 20
 PESO_RESET_KG = 300
 PASTA_DADOS = Path(__file__).resolve().parent / "AutoWeightData"
@@ -39,13 +43,41 @@ inicio_peso_candidato = None
 pesagem_registrada = False
 ultima_pesagem_registrada_kg = None
 camera = None
+publicador = None
+estabilidade_api = None
+sirene = None
 ultima_foto = None
 ultima_tentativa_foto = float("-inf")
 parar = threading.Event()
 estado_lock = threading.Lock()
 estado = {"peso": None, "recebido": None, "foto": None,
-          "hora": None, "peso_foto": None, "foto_branca": False,
-          "mensagem": "Iniciando…"}
+          "hora": None, "peso_foto": None, "foto_contingencia": False,
+          "mensagem": "Iniciando…", "modo_ausente": False,
+          "sirene": "Sirene: aguardando registro."}
+
+
+def alternar_modo_ausente():
+    with estado_lock:
+        estado["modo_ausente"] = not estado["modo_ausente"]
+        ativo = estado["modo_ausente"]
+    print(f"[{agora()}] Modo ausente {'ATIVADO' if ativo else 'DESATIVADO'}.")
+    return ativo
+
+
+def informar_sirene(mensagem):
+    atualizar_estado(sirene=mensagem)
+    print(f"[{agora()}] {mensagem}")
+
+
+def teclado_texto(encerrar):
+    import msvcrt
+    while not encerrar.wait(0.05):
+        if msvcrt.kbhit():
+            tecla = msvcrt.getwch()
+            if tecla in ("\x00", "\xe0"):
+                msvcrt.getwch()
+            elif tecla.lower() == "a":
+                alternar_modo_ausente()
 
 
 def atualizar_estado(**valores):
@@ -132,29 +164,29 @@ def registrar_pesagem_foto(amostras, substituir_ultima=False):
     horario = datetime.now()
     nome = horario.strftime("%Y-%m-%d-%H-%M-%S-%f")
     destino = PASTA_DADOS / f"{nome}-{peso_maximo}kg.jpg"
-    foto_branca = False
+    foto_contingencia = False
     try:
         frame = camera.foto_recente() if camera is not None else None
         if frame is None:
             raise RuntimeError("Sem imagem recente da câmera")
         salvar_jpeg(frame, destino)
     except Exception as erro:
-        foto_branca = True
+        foto_contingencia = True
         print(f"[{agora()}] Foto indisponível ({type(erro).__name__}); "
-              "registrando imagem em branco.")
+              "registrando ilustração de contingência.")
         try:
-            salvar_jpeg(np.full((1080, 1920, 3), 255, dtype=np.uint8), destino)
-        except Exception as erro_branco:
+            salvar_jpeg(carregar_contingencia(), destino, contingencia=True)
+        except Exception as erro_contingencia:
             atualizar_estado(mensagem="Falha ao salvar a pesagem. Nova tentativa em breve.")
-            print(f"[{agora()}] Não foi possível gravar a imagem em branco "
-                  f"({type(erro_branco).__name__}). "
+            print(f"[{agora()}] Não foi possível gravar a imagem de contingência "
+                  f"({type(erro_contingencia).__name__}). "
                   "Pesagem ainda não registrada; haverá nova tentativa.")
             return None
 
     anterior = ultima_foto
     ultima_foto = destino
     atualizar_estado(foto=destino, hora=horario, peso_foto=peso_maximo,
-                     foto_branca=foto_branca, mensagem="Pesagem registrada.")
+                     foto_contingencia=foto_contingencia, mensagem="Pesagem registrada.")
     if substituir_ultima and anterior is not None:
         try:
             anterior.unlink(missing_ok=True)
@@ -252,6 +284,8 @@ def avaliar_pesagem(peso):
         ultima_pesagem_registrada_kg = peso_registrado
         pesagem_registrada = True
         limpar_candidato()
+        if not substituir_ultima and obter_estado()["modo_ausente"] and sirene is not None:
+            sirene.acionar()
         print(
             f"[{agora()}] Aguardando peso cair abaixo de {PESO_RESET_KG} kg "
             "para liberar a próxima pesagem."
@@ -268,6 +302,8 @@ def processar_linha(linha):
         return
 
     status_balanca, peso = resultado
+    if estabilidade_api is not None:
+        estabilidade_api.avaliar(peso)
     atualizar_estado(peso=peso, recebido=time.monotonic(), mensagem="Recebendo peso da balança")
     agora_time = time.time()
 
@@ -317,6 +353,8 @@ def reconectar(ser, motivo):
         pass
 
     limpar_candidato()
+    if estabilidade_api is not None:
+        estabilidade_api.reset()
     atualizar_estado(peso=None, mensagem="Reconectando à balança…")
     parar.wait(2)
     novo_ser = conectar()
@@ -327,8 +365,9 @@ def reconectar(ser, motivo):
     return novo_ser
 
 
-def executar(verbose=False):
+def executar(verbose=False, sem_gui=False):
     global ultimo_dado_recebido, buffer, modo_verbose, camera
+    global publicador, estabilidade_api, sirene
 
     modo_verbose = verbose
     ser = None
@@ -342,6 +381,35 @@ def executar(verbose=False):
         return
 
     camera.start()
+    sirene = Sirene(informar_sirene)
+    encerrar_teclado = threading.Event()
+    leitor_teclado = None
+    if sem_gui and sys.platform == "win32" and sys.stdin.isatty():
+        print("Modo ausente DESATIVADO. Pressione A para alternar (sem Enter).")
+        leitor_teclado = threading.Thread(target=teclado_texto, args=(encerrar_teclado,), daemon=True)
+        leitor_teclado.start()
+    try:
+        configuracao = carregar_configuracao()
+        if configuracao is not None:
+            logger = logging.getLogger("agrolima")
+            if not logger.handlers:
+                handler = RotatingFileHandler(PASTA_DADOS / "agrolima.log",
+                                              maxBytes=1_000_000, backupCount=3,
+                                              encoding="utf-8")
+                handler.setFormatter(logging.Formatter("%(asctime)s %(message)s"))
+                logger.addHandler(handler)
+                logger.setLevel(logging.INFO)
+                logger.propagate = False
+            publicador = Publicador(*configuracao,
+                                    informar=lambda mensagem: atualizar_estado(api=mensagem))
+            estabilidade_api = Estabilidade(publicador.publicar,
+                                           TEMPO_ESTABILIDADE_API_SEGUNDOS, OSCILACAO_MAXIMA_KG)
+            publicador.start()
+            atualizar_estado(api="AgroLima: aguardando peso estável.")
+        else:
+            atualizar_estado(api="AgroLima: integração não configurada.")
+    except (ValueError, OSError):
+        atualizar_estado(api="AgroLima: verifique a configuração e o acesso ao log; reinicie.")
 
     print(f"[{agora()}] Lendo balança. Ctrl+C para parar.")
     if modo_verbose:
@@ -391,6 +459,12 @@ def executar(verbose=False):
         print(f"[{agora()}] Leitura interrompida: {erro!r}")
 
     finally:
+        encerrar_teclado.set()
+        if leitor_teclado is not None:
+            leitor_teclado.join()
+        sirene.close()
+        if publicador is not None:
+            publicador.close()
         camera.close()
         try:
             ser.close()
@@ -401,7 +475,7 @@ def executar(verbose=False):
 def main():
     args = configurar_argumentos()
     if args.sem_gui:
-        executar(args.verbose)
+        executar(args.verbose, sem_gui=True)
     else:
         from gui import iniciar
         iniciar(sys.modules[__name__], args.verbose)

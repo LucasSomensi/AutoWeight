@@ -1,6 +1,5 @@
 """Leitura contínua da câmera, sem bloquear a porta serial."""
 
-import json
 import os
 import threading
 import time
@@ -9,16 +8,27 @@ from pathlib import Path
 os.environ.setdefault("OPENCV_FFMPEG_CAPTURE_OPTIONS", "rtsp_transport;tcp")
 
 import cv2
+import numpy as np
+from dotenv import dotenv_values
+
+IMAGEM_CONTINGENCIA = Path(__file__).resolve().parent / "assets" / "camera-indisponivel-manga.png"
+MARCADOR_CONTINGENCIA = b"AutoWeight:contingencia:manga"
 
 
-def carregar_url():
-    url = os.environ.get("AUTOWEIGHT_CAMERA_URL")
+def carregar_contingencia():
+    frame = cv2.imdecode(np.frombuffer(IMAGEM_CONTINGENCIA.read_bytes(), dtype=np.uint8),
+                         cv2.IMREAD_COLOR)
+    if frame is None:
+        raise OSError("Imagem de contingência inválida.")
+    return frame
+
+
+def carregar_url(arquivo=None):
+    arquivo = Path(arquivo) if arquivo is not None else Path(__file__).with_name(".env")
+    valores = dotenv_values(arquivo, encoding="utf-8-sig", interpolate=False)
+    url = os.environ.get("AUTOWEIGHT_CAMERA_URL", valores.get("AUTOWEIGHT_CAMERA_URL"))
     if not url:
-        try:
-            config = Path(__file__).with_name("camera.local.json")
-            url = json.loads(config.read_text(encoding="utf-8"))["rtsp_url"]
-        except (OSError, ValueError, KeyError, TypeError):
-            raise RuntimeError("Configure rtsp_url em camera.local.json.") from None
+        raise RuntimeError("Configure AUTOWEIGHT_CAMERA_URL no .env.")
     if not isinstance(url, str) or not url.startswith("rtsp://"):
         raise RuntimeError("A câmera precisa de uma URL RTSP válida.")
     return url
@@ -78,16 +88,20 @@ class Camera:
                 self._stop.wait(3)
 
 
-def salvar_jpeg(frame, destino):
+def salvar_jpeg(frame, destino, contingencia=False):
     """Publica somente um JPEG completo, inclusive em caminhos com acentos."""
     ok, encoded = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 95])
     if not ok:
         raise OSError("Não foi possível codificar a foto.")
+    dados = encoded.tobytes()
+    if contingencia:
+        comentario = b"\xff\xfe" + (len(MARCADOR_CONTINGENCIA) + 2).to_bytes(2, "big") + MARCADOR_CONTINGENCIA
+        dados = dados[:2] + comentario + dados[2:]
     destino.parent.mkdir(parents=True, exist_ok=True)
     temporario = destino.with_suffix(".jpg.tmp")
     try:
         with temporario.open("xb") as arquivo:
-            arquivo.write(encoded.tobytes())
+            arquivo.write(dados)
         temporario.replace(destino)
     finally:
         temporario.unlink(missing_ok=True)

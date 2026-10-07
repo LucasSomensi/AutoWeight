@@ -7,3 +7,5 @@ teste-camera.jpg
 .codex/
 .env
 .env.*
+*.lnk
+api_key.txt
