@@ -50,6 +50,32 @@ class PesagensTest(unittest.TestCase):
         self.weigh(3000, 5)
         self.assertEqual(len(list(self.app.PASTA_DADOS.glob('*.jpg'))), 2)
 
+    def test_away_requires_five_seconds_for_first_photo_and_replacement(self):
+        self.app.alternar_modo_ausente()
+        self.weigh(2000)
+        self.weigh(2000, 3)
+        self.assertFalse(self.app.pesagem_registrada)
+        self.weigh(2000, 1.9)
+        self.assertIsNone(self.app.ultima_foto)
+        self.weigh(2000, 0.1)
+        original = self.app.ultima_foto
+        self.assertTrue(original.exists())
+        self.weigh(2500)
+        self.weigh(2500, 3)
+        self.assertEqual(self.app.ultima_foto, original)
+        self.weigh(2500, 2)
+        self.assertFalse(original.exists())
+        self.assertEqual(self.app.ultima_pesagem_registrada_kg, 2500)
+
+    def test_enabling_away_during_stability_requires_five_seconds(self):
+        self.weigh(2000)
+        self.weigh(2000, 2)
+        self.app.alternar_modo_ausente()
+        self.weigh(2000, 1)
+        self.assertFalse(self.app.pesagem_registrada)
+        self.weigh(2000, 2)
+        self.assertTrue(self.app.pesagem_registrada)
+
     def assert_manga(self, photo):
         image = cv2.imread(str(photo))
         original = carregar_contingencia()

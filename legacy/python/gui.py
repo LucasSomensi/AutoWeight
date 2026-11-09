@@ -1,5 +1,6 @@
 """Painel local; somente a thread principal acessa os widgets do Tk."""
 
+import os
 import threading
 import time
 import tkinter as tk
@@ -99,6 +100,10 @@ class Painel:
                                  font=("Segoe UI", 15), width=3, relief="flat",
                                  bg="#e5ebf0", fg="#243b50", state="disabled")
         self.proxima.pack(side="left")
+        self.zoom = tk.Button(navegacao, text="Ampliar", command=self.abrir_zoom,
+                              font=("Segoe UI", 11), relief="flat",
+                              bg="#e5ebf0", fg="#243b50", padx=12, state="disabled")
+        self.zoom.pack(side="left", padx=(12, 0))
         self.detalhes = self.label(registro, "Nenhuma pesagem registrada", 17, bold=True)
         self.detalhes.pack(anchor="w", pady=(8, 4))
         self.aviso = self.label(registro, "A foto aparecerá após a gravação da pesagem.", 10)
@@ -139,6 +144,7 @@ class Painel:
         except (OSError, ValueError, cv2.error):
             self.frame = None
             self.aviso.configure(text="Não foi possível abrir a foto registrada.", fg="#b42318")
+        self.zoom.configure(state="normal" if self.frame is not None else "disabled")
         self.desenhar()
 
     def atualizar_registros(self):
@@ -170,21 +176,34 @@ class Painel:
                 self.carregar_foto(*self.registros[indice])
         self.atualizar_botoes()
 
+    def abrir_zoom(self):
+        if self.frame is None or self.foto_atual is None:
+            return
+        try:
+            os.startfile(str(self.foto_atual.resolve()))
+        except (OSError, AttributeError):
+            self.aviso.configure(text="Não foi possível abrir a foto no visualizador padrão.",
+                                 fg="#b42318")
+
     def desenhar(self, event=None):
-        self.canvas.delete("all")
-        largura, altura = self.canvas.winfo_width(), self.canvas.winfo_height()
+        self.imagem = self.desenhar_imagem(self.canvas)
+
+    def desenhar_imagem(self, canvas):
+        canvas.delete("all")
+        largura, altura = canvas.winfo_width(), canvas.winfo_height()
         if self.frame is None:
-            self.canvas.create_text(largura / 2, altura / 2, text="Aguardando foto da pesagem",
+            canvas.create_text(largura / 2, altura / 2, text="Aguardando foto da pesagem",
                                     fill="#64788b", font=("Segoe UI", 15))
             return
         h, w = self.frame.shape[:2]
         escala = min(max(largura, 1) / w, max(altura, 1) / h)
         reduzida = cv2.resize(self.frame, (max(1, int(w * escala)), max(1, int(h * escala))),
-                              interpolation=cv2.INTER_AREA)
+                              interpolation=cv2.INTER_AREA if escala < 1 else cv2.INTER_LINEAR)
         ok, png = cv2.imencode(".png", reduzida)
         if ok:
-            self.imagem = tk.PhotoImage(data=png.tobytes(), format="png")
-            self.canvas.create_image(largura / 2, altura / 2, image=self.imagem)
+            imagem = tk.PhotoImage(master=canvas, data=png.tobytes(), format="png")
+            canvas.create_image(largura / 2, altura / 2, image=imagem)
+            return imagem
 
     def atualizar(self):
         if self.fechando:

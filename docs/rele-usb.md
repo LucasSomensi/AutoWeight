@@ -1,5 +1,14 @@
 # Relé USB da sirene
 
+A implementação oficial agora é Rust. Use `AutoWeight-CLI.cmd rele listar`,
+`AutoWeight-CLI.cmd rele teste` ou `AutoWeight-CLI.cmd rele pulso --segundos 2`
+na raiz do projeto. `--porta COM7` seleciona uma porta, validando o VID/PID
+CH340 antes de enviar comandos. O programa principal detecta automaticamente
+o relé antes de cada pulso no modo ausente.
+
+Os comandos Python e os relatos de validação abaixo são documentação histórica
+do legado congelado. A migração não realizou um novo acionamento físico.
+
 ## Identificação e teste
 
 Em 05/10/2026, o Windows identificou o módulo como **USB-SERIAL CH340

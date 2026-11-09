@@ -9,3 +9,5 @@ teste-camera.jpg
 .env.*
 *.lnk
 api_key.txt
+/bin/
+/dist/

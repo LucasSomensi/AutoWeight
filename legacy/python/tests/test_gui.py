@@ -6,7 +6,7 @@ import unittest
 from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import numpy as np
 
@@ -35,6 +35,7 @@ class GuiTest(unittest.TestCase):
             self.assertIn('DESATIVADO', painel.ausente.cget('text'))
             self.assertEqual(painel.anterior.cget('state'), 'disabled')
             self.assertEqual(painel.proxima.cget('state'), 'disabled')
+            self.assertEqual(painel.zoom.cget('state'), 'disabled')
 
             def registrar(hora, peso):
                 caminho = pasta / f'2026-09-07-{hora:02d}-00-00-000000-{peso}kg.jpg'
@@ -45,6 +46,10 @@ class GuiTest(unittest.TestCase):
 
             primeira = registrar(10, 2000)
             self.assertEqual(painel.foto_atual, primeira)
+            self.assertEqual(painel.zoom.cget('state'), 'normal')
+            with patch('gui.os.startfile', create=True) as abrir:
+                painel.zoom.invoke()
+                abrir.assert_called_once_with(str(primeira.resolve()))
             segunda = registrar(11, 3000)
             self.assertEqual(painel.foto_atual, segunda)
             painel.anterior.invoke()
@@ -64,6 +69,12 @@ class GuiTest(unittest.TestCase):
             substituta = registrar(13, 4500)
             self.assertEqual(painel.foto_atual, substituta)
             self.assertEqual(painel.posicao.cget('text'), '3 / 3')
+            with patch('gui.os.startfile', create=True) as abrir:
+                painel.zoom.invoke()
+                abrir.assert_called_once_with(str(substituta.resolve()))
+            with patch('gui.os.startfile', side_effect=OSError, create=True):
+                painel.zoom.invoke()
+                self.assertIn('Não foi possível abrir', painel.aviso.cget('text'))
             painel.worker.join(3)
 
     def test_camera_status_expires(self):

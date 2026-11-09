@@ -24,6 +24,7 @@ TEMPO_SEM_DADOS_PARA_RECONECTAR = 15
 
 LIMITE_PESO_KG = 1000
 TEMPO_ESTABILIDADE_SEGUNDOS = 3
+TEMPO_ESTABILIDADE_AUSENTE_SEGUNDOS = 5
 TEMPO_ESTABILIDADE_API_SEGUNDOS = 1
 OSCILACAO_MAXIMA_KG = 20
 PESO_RESET_KG = 300
@@ -274,7 +275,9 @@ def avaliar_pesagem(peso):
 
     duracao_candidato = timestamp_atual - inicio_peso_candidato
 
-    if duracao_candidato >= TEMPO_ESTABILIDADE_SEGUNDOS:
+    tempo_estabilidade = (TEMPO_ESTABILIDADE_AUSENTE_SEGUNDOS
+                         if obter_estado()["modo_ausente"] else TEMPO_ESTABILIDADE_SEGUNDOS)
+    if duracao_candidato >= tempo_estabilidade:
         peso_registrado = registrar_pesagem_foto(
             list(amostras_estabilidade),
             substituir_ultima=substituir_ultima,
@@ -419,7 +422,8 @@ def executar(verbose=False, sem_gui=False):
         f"[{agora()}] Registro por foto ativo: salva em {PASTA_DADOS} quando peso > "
         f"{LIMITE_PESO_KG} kg e permanece dentro de +/- "
         f"{OSCILACAO_MAXIMA_KG} kg do candidato por "
-        f"{TEMPO_ESTABILIDADE_SEGUNDOS}s."
+        f"{TEMPO_ESTABILIDADE_SEGUNDOS}s "
+        f"({TEMPO_ESTABILIDADE_AUSENTE_SEGUNDOS}s no modo ausente)."
     )
 
     try:
